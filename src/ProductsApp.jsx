@@ -28,7 +28,9 @@ export const ProductsApp = ({ title = "title default" }) => {
     id: 0,
     name: '',
     description: '',
-    price: ''
+    price: '',
+    color: '',
+    stock: ''
   })
 
   const getProducts = async () => {

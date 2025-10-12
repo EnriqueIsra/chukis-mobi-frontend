@@ -6,13 +6,15 @@ const initialDataForm = {
   name: '',
   description: '',
   price: '',
+  color: '',
+  stock: ''
 };
 
-export const ProductForm = ({handlerAdd, productSelected}) => {
+export const ProductForm = ({ handlerAdd, productSelected }) => {
 
   const [form, setForm] = useState(initialDataForm)
 
-  const { id, name, description, price } = form;
+  const { id, name, description, price, color, stock } = form;
 
   useEffect(() => {
     setForm(productSelected)
@@ -21,7 +23,7 @@ export const ProductForm = ({handlerAdd, productSelected}) => {
   return <form
     onSubmit={(event) => {
       event.preventDefault();
-      if (!name || !description || !price) {
+      if (!name || !description || !price || !color || !stock) {
         alert('Debe completear los datos del formulario')
         return;
       }
@@ -47,7 +49,25 @@ export const ProductForm = ({handlerAdd, productSelected}) => {
     </div>
 
     <div>
+      <input placeholder="Color"
+        className="form-control my-3 w-75"
+        name="color"
+        value={color}
+        onChange={(event) => setForm({ ...form, color: event.target.value })} />
+    </div>
+
+    <div>
+      <input placeholder="Stock"
+        type="number"
+        className="form-control my-3 w-75"
+        name="stock"
+        value={stock}
+        onChange={(event) => setForm({ ...form, stock: event.target.value })} />
+    </div>
+
+    <div>
       <input placeholder="Price"
+        type="number"
         className="form-control my-3 w-75"
         name="price"
         value={price}

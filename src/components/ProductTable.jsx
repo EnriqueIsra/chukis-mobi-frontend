@@ -8,6 +8,8 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
           <th>id</th>
           <th>name</th>
           <th>description</th>
+          <th>color</th>
+          <th>stock</th>
           <th>price</th>
           <th>update</th>
           <th>remove</th>
@@ -20,6 +22,8 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
               <td>{product.id}</td>
               <td>{product.name}</td>
               <td>{product.description}</td>
+              <td>{product.color}</td>
+              <td>{product.stock}</td>
               <td>${product.price}</td>
               <td><button className="btn btn-sm btn-primary"
               onClick={() => handlerProductSelected(product)} >update</button></td>
