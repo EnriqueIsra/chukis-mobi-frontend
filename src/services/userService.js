@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8080/api/products";
+const baseUrl = "http://localhost:8080/api/users";
 
-export const findAll = async () => {
+export const findAllUsers = async () => {
   try {
     const response = await axios.get(baseUrl);
     return response;
@@ -11,35 +11,33 @@ export const findAll = async () => {
   }
   return [];
 };
-export const create = async ({ name, description, price, color, stock }) => {
+export const createUser = async ({ username, role, password, imageUrl }) => {
   try {
     return await axios.post(baseUrl, {
-      name,
-      description,
-      price,
-      color,
-      stock
+      username,
+      role,
+      password,
+      imageUrl
     });
   } catch (error) {
     console.log(error);
   }
   return undefined;
 };
-export const update = async ({ id, name, description, price, color, stock }) => {
+export const updateUser = async ({ id, username, role, password, imageUrl }) => {
   try {
     return await axios.put(`${baseUrl}/${id}`, {
-      name,
-      description,
-      price,
-      color,
-      stock
+      username,
+      role,
+      password,
+      imageUrl
     });
   } catch (error) {
     console.log(error);
   }
   return undefined;
 };
-export const remove = async (id) => {
+export const removeUser = async (id) => {
   try {
     await axios.delete(`${baseUrl}/${id}`);
   } catch (error) {
