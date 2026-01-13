@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { UserForm } from "../components/users/UserForm";
 import { UserTable } from "../components/users/UserTable";
+import { UsersToolbar } from "../components/users/UsersToolbar";
+import { UserCard } from "../components/users/UserCard";
+import Swal from "sweetalert2";
 import { createUser, findAllUsers, removeUser, updateUser } from "../services/userService";
 
 export const UsersPage = () => {
@@ -13,6 +16,7 @@ export const UsersPage = () => {
         password: '',
         image_url: '',
     })
+    const [viewMode, setViewMode] = useState("table");
 
     const getUsers = async () => {
         const result = await findAllUsers()
@@ -21,6 +25,7 @@ export const UsersPage = () => {
 
     useEffect(() => {
         getUsers()
+        findAllUsers().then(res => setUsers(res.data));
     }, [])
 
     const handlerAddUser = async (user) => {
@@ -84,7 +89,7 @@ export const UsersPage = () => {
     return (
         <>
             <h2>Usuarios</h2>
-
+            <UsersToolbar viewMode={viewMode} setViewMode={setViewMode} />
             <div className="row">
                 <div className="col-md-4">
                     <UserForm
@@ -93,19 +98,33 @@ export const UsersPage = () => {
                     />
                 </div>
 
-                <div className="col-md-8">
-                    {users.length > 0 ? (
-                        <UserTable
-                            users={users}
-                            handlerUserSelected={handlerUserSelected}
-                            handlerRemoveUser={handlerRemoveUser}
-                        />
-                    ) : (
-                        <div className="alert alert-warning">
-                            No hay usuarios
-                        </div>
-                    )}
-                </div>
+                {viewMode === "table" ? (
+
+                    <div className="col-md-8">
+                        {users.length > 0 ? (
+                            <UserTable
+                                users={users}
+                                handlerUserSelected={handlerUserSelected}
+                                handlerRemoveUser={handlerRemoveUser}
+                            />
+                        ) : (
+                            <div className="alert alert-warning">
+                                No hay usuarios
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="col-md-8">
+                        {users.map(user => (
+                            <UserCard
+                                key={user.id}
+                                user={user}
+                                onEdit={() => { }}
+                                onRemove={removeUser}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </>
     );
