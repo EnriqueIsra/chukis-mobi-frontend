@@ -33,7 +33,6 @@ export const ChukisApp = ({ title = "title default", user, onLogout }) => {
   const getProducts = async () => {
     const result = await findAll()
     setProducts(result.data)
-
   }
 
   const getUsers = async () => {

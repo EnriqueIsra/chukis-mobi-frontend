@@ -12,14 +12,14 @@ const initialDataForm = {
 export const UserForm = ({ handlerAdd, userSelected }) => {
 
     const [form, setForm] = useState(initialDataForm)
-
     const { id, username, role, password, imageUrl } = form;
-
+    
     useEffect(() => {
         setForm(userSelected)
     }, [userSelected])
 
     return <form
+        autoComplete="off"
         onSubmit={(event) => {
             event.preventDefault();
             if (!username || !role || !password || !imageUrl) {
@@ -32,9 +32,15 @@ export const UserForm = ({ handlerAdd, userSelected }) => {
         }}
     >
         <div>
-            <input placeholder="Username"
+            <input
+                id="create-username"
+                name="create-username"
+                type="text"
+                placeholder="Usuario"
                 className="form-control my-3 w-75"
-                name="username"
+                autoComplete="new-password"
+                readOnly
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
                 value={username}
                 onChange={(event) => setForm({ ...form, username: event.target.value })} />
         </div>
@@ -53,16 +59,22 @@ export const UserForm = ({ handlerAdd, userSelected }) => {
         </div>
 
         <div>
-            <input placeholder="Password"
+            <input 
+                readOnly
+                placeholder="Password"
                 type="password"
                 className="form-control my-3 w-75"
-                name="password"
+                name="create-password"
+                id="create-password"
+                autoComplete="new-password"
                 value={password}
+                onFocus={(e) => e.target.removeAttribute("readOnly")}
                 onChange={(event) => setForm({ ...form, password: event.target.value })} />
         </div>
 
         <div>
-            <input placeholder="URL imagen"
+            <input 
+                placeholder="URL imagen"
                 className="form-control my-3 w-75"
                 name="imageUrl"
                 value={imageUrl}

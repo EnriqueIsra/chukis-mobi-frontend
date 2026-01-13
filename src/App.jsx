@@ -1,30 +1,55 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
+
 import { LoginPage } from "./auth/LoginPage";
-import { ChukisApp } from "./ChukisApp";
+import { MainLayout } from "./layout/MainLayout";
+import { ProductsPage } from "./pages/ProductsPage";
+import { UsersPage } from "./pages/UsersPage";
+import { DashboardPage } from "./pages/DashboardPage";
 
 export const App = () => {
 
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("user")) || null
-  );
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const handleLogin = (userData) => {
-    localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
     setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (
-    <>
-      {
-        user
-          ? <ChukisApp user={user} onLogout={handleLogout} />
-          : <LoginPage onLogin={handleLogin} />
-      }
-    </>
+    <BrowserRouter>
+      <Routes>
+
+        <Route
+          path="/login"
+          element={
+            user
+              ? <Navigate to="/" />
+              : <LoginPage onLogin={handleLogin} />
+          }
+        />
+
+        <Route
+          element={
+            user
+              ? <MainLayout user={user} onLogout={handleLogout} />
+              : <Navigate to="/login" />
+          }
+        >
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/users" element={<UsersPage />} />
+        </Route>
+
+      </Routes>
+    </BrowserRouter>
   );
 };

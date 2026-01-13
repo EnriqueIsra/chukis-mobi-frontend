@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../services/authService";
 
 export const LoginPage = ({ onLogin }) => {
@@ -6,6 +6,12 @@ export const LoginPage = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    // Limpia cualquier autofill al montar
+    useEffect(() => {
+        setUsername("");
+        setPassword("");
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,19 +40,31 @@ export const LoginPage = ({ onLogin }) => {
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
-                <form onSubmit={handleSubmit}>
+                <form autoComplete="off" onSubmit={handleSubmit}>
+
                     <input
+                        type="text"
+                        name="login-username"
+                        id="login-username"
                         className="form-control mb-3"
                         placeholder="Usuario"
                         value={username}
+                        autoComplete="new-password"
+                        readOnly
+                        onFocus={(e) => e.target.removeAttribute("readOnly")}
                         onChange={(e) => setUsername(e.target.value)}
                     />
 
                     <input
                         type="password"
+                        name="login-password"
+                        id="login-password"
                         className="form-control mb-3"
                         placeholder="Contraseña"
                         value={password}
+                        autoComplete="new-password"
+                        readOnly
+                        onFocus={(e) => e.target.removeAttribute("readOnly")}
                         onChange={(e) => setPassword(e.target.value)}
                     />
 
