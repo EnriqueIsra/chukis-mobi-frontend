@@ -1,29 +1,14 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { ProductTable } from "./components/ProductTable";
-import { ProductForm } from "./components/ProductForm";
+import { ProductTable } from "./components/products/ProductTable";
+import { ProductForm } from "./components/products/ProductForm";
 import { create, findAll, remove, update } from "./services/productService";
-import { UserTable } from "./components/UserTable";
-import { UserForm } from "./components/UserForm";
+import { UserTable } from "./components/users/UserTable";
+import { UserForm } from "./components/users/UserForm";
 import { createUser, findAllUsers, removeUser, updateUser } from "./services/userService";
 import Swal from "sweetalert2";
 
-// const initProducts = [
-//   {
-//     id: 1,
-//     name: "Monitor Asus 37 pulgadas",
-//     description: "El monitor es perfecto para juegos",
-//     price: 1000,
-//   },
-//   {
-//     id: 2,
-//     name: "Iphone 16 pro",
-//     description: "El telefono es excelente e incluye Apple Intelligence",
-//     price: 1600,
-//   },
-// ];
-
-export const ProductsApp = ({ title = "title default" }) => {
+export const ChukisApp = ({ title = "title default", user, onLogout }) => {
 
   const [products, setProducts] = useState([])
   const [users, setUsers] = useState([])
@@ -103,7 +88,7 @@ export const ProductsApp = ({ title = "title default" }) => {
       )
       Swal.fire({
         title: "actualizado con éxito",
-        text: `usuario ${user.name} actualizado con éxito`,
+        text: `Usuario ${user.username} actualizado con éxito`,
         icon: "success"
       });
     } else {
@@ -111,7 +96,7 @@ export const ProductsApp = ({ title = "title default" }) => {
       setUsers([...users, { ...response.data }]);
       Swal.fire({
         title: "Creado con éxito",
-        text: `Usuario ${user.name} creado con éxito`,
+        text: `Usuario ${user.username} creado con éxito`,
         icon: "success"
       });
     }
@@ -182,7 +167,20 @@ export const ProductsApp = ({ title = "title default" }) => {
   }
 
   return (
+
     <div className="container my-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2>ChukisApp</h2>
+        <div>
+          <span className="me-3">
+            👤 {user.username} ({user.role})
+          </span>
+          <button className="btn btn-outline-danger btn-sm" onClick={onLogout}>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+
       <h2>{title}</h2>
       <h2>Productos</h2>
       <div className="row">
@@ -224,6 +222,6 @@ export const ProductsApp = ({ title = "title default" }) => {
   );
 };
 
-ProductsApp.propTypes = {
+ChukisApp.propTypes = {
   title: PropTypes.string.isRequired,
 };
