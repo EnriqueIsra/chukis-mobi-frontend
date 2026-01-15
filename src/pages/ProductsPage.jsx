@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { ProductForm } from "../components/products/ProductForm";
 import { ProductTable } from "../components/products/ProductTable";
+import { ProductsToolbar } from "../components/products/ProductsToolbar";
+import { ProductCard } from "../components/products/ProductCard";
+import { ProductModal } from "../components/products/ProductModal";
 import Swal from "sweetalert2";
 import { findAll, create, update, remove } from "../services/productService";
 
@@ -13,8 +15,11 @@ export const ProductsPage = () => {
         description: '',
         price: '',
         color: '',
-        stock: ''
+        stock: '',
+        imageUrl: ''
     })
+    const [viewMode, setViewMode] = useState("table");
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getProducts = async () => {
         const result = await findAll()
@@ -26,8 +31,10 @@ export const ProductsPage = () => {
     }, [])
     
     const handlerAddProduct = async (product) => {
+        console.log('handlerAddProduct received:', product);
         if (product.id > 0) {
             const response = await update(product)
+            console.log('Update response:', response.data);
             setProducts(
                 products.map(prod => {
                     if (prod.id == product.id) {
@@ -43,6 +50,7 @@ export const ProductsPage = () => {
             });
         } else {
             const response = await create(product);
+            console.log('Create response:', response.data);
             setProducts([...products, { ...response.data }]);
             Swal.fire({
                 title: "Creado con éxito",
@@ -54,7 +62,33 @@ export const ProductsPage = () => {
 
     const handlerProductSelected = (product) => {
         setProductSelected({ ...product })
-        console.log(productSelected)
+        setIsModalOpen(true)
+    }
+
+    const handlerOpenModal = () => {
+        setProductSelected({
+            id: 0,
+            name: '',
+            description: '',
+            price: '',
+            color: '',
+            stock: '',
+            imageUrl: ''
+        })
+        setIsModalOpen(true)
+    }
+
+    const handlerCloseModal = () => {
+        setIsModalOpen(false)
+        setProductSelected({
+            id: 0,
+            name: '',
+            description: '',
+            price: '',
+            color: '',
+            stock: '',
+            imageUrl: ''
+        })
     }
 
     const handlerRemoveProduct = (id) => {
@@ -85,30 +119,61 @@ export const ProductsPage = () => {
 
     return (
         <>
-            <h2>Productos</h2>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="mb-0">Productos</h2>
+                <button
+                    className="btn btn-primary"
+                    onClick={handlerOpenModal}
+                >
+                    <i className="bi bi-plus-lg"></i> Agregar Producto
+                </button>
+            </div>
 
-            <div className="row">
-                <div className="col-md-4">
-                    <ProductForm
-                        handlerAdd={handlerAddProduct}
-                        productSelected={productSelected}
-                    />
+            <ProductsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+
+            {viewMode === "table" ? (
+                <div className="row">
+                    <div className="col-12">
+                        {products.length > 0 ? (
+                            <ProductTable
+                                products={products}
+                                handlerProductSelected={handlerProductSelected}
+                                handlerRemoveProduct={handlerRemoveProduct}
+                            />
+                        ) : (
+                            <div className="alert alert-warning">
+                                No hay productos
+                            </div>
+                        )}
+                    </div>
                 </div>
-
-                <div className="col-md-8">
+            ) : (
+                <div className="row">
                     {products.length > 0 ? (
-                        <ProductTable
-                            products={products}
-                            handlerProductSelected={handlerProductSelected}
-                            handlerRemoveProduct={handlerRemoveProduct}
-                        />
+                        products.map(product => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onEdit={handlerProductSelected}
+                                onRemove={handlerRemoveProduct}
+                            />
+                        ))
                     ) : (
-                        <div className="alert alert-warning">
-                            No hay productos
+                        <div className="col-12">
+                            <div className="alert alert-warning">
+                                No hay productos
+                            </div>
                         </div>
                     )}
                 </div>
-            </div>
+            )}
+
+            <ProductModal
+                isOpen={isModalOpen}
+                onClose={handlerCloseModal}
+                handlerAdd={handlerAddProduct}
+                productSelected={productSelected}
+            />
         </>
     );
 };

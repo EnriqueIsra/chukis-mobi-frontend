@@ -6,11 +6,11 @@ export const UserTable = ({ users, handlerUserSelected, handlerRemoveUser }) => 
       <thead>
         <tr>
           <th>id</th>
-          <th>username</th>
-          <th>role</th>
-          <th>imageUrl</th>
-          <th>update</th>
-          <th>remove</th>
+          <th>usuario</th>
+          <th>rol</th>
+          <th>imagen</th>
+          <th>editar</th>
+          <th>eliminar</th>
         </tr>
       </thead>
       <tbody>
@@ -22,9 +22,9 @@ export const UserTable = ({ users, handlerUserSelected, handlerRemoveUser }) => 
               <td>{user.role}</td>
               <td>{user.imageUrl}</td>
               <td><button className="btn btn-sm btn-primary"
-              onClick={() => handlerUserSelected(user)} >update</button></td>
+              onClick={() => handlerUserSelected(user)} >editar</button></td>
               <td><button className="btn btn-sm btn-danger"
-              onClick={() => handlerRemoveUser(user.id)}>remove</button></td>
+              onClick={() => handlerRemoveUser(user.id)}>eliminar</button></td>
             </tr>
           )
         })}

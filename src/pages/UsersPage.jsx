@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { UserForm } from "../components/users/UserForm";
 import { UserTable } from "../components/users/UserTable";
 import { UsersToolbar } from "../components/users/UsersToolbar";
 import { UserCard } from "../components/users/UserCard";
+import { UserModal } from "../components/users/UserModal";
 import Swal from "sweetalert2";
 import { createUser, findAllUsers, removeUser, updateUser } from "../services/userService";
 
@@ -14,9 +14,10 @@ export const UsersPage = () => {
         username: '',
         role: '',
         password: '',
-        image_url: '',
+        imageUrl: '',
     })
     const [viewMode, setViewMode] = useState("table");
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getUsers = async () => {
         const result = await findAllUsers()
@@ -57,7 +58,29 @@ export const UsersPage = () => {
 
     const handlerUserSelected = (user) => {
         setUserSelected({ ...user })
-        console.log(userSelected)
+        setIsModalOpen(true)
+    }
+
+    const handlerOpenModal = () => {
+        setUserSelected({
+            id: 0,
+            username: '',
+            role: '',
+            password: '',
+            imageUrl: '',
+        })
+        setIsModalOpen(true)
+    }
+
+    const handlerCloseModal = () => {
+        setIsModalOpen(false)
+        setUserSelected({
+            id: 0,
+            username: '',
+            role: '',
+            password: '',
+            imageUrl: '',
+        })
     }
 
     const handlerRemoveUser = (id) => {
@@ -88,19 +111,21 @@ export const UsersPage = () => {
 
     return (
         <>
-            <h2>Usuarios</h2>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <h2 className="mb-0">Usuarios</h2>
+                <button
+                    className="btn btn-primary"
+                    onClick={handlerOpenModal}
+                >
+                    <i className="bi bi-plus-lg"></i> Agregar Usuario
+                </button>
+            </div>
+
             <UsersToolbar viewMode={viewMode} setViewMode={setViewMode} />
-            <div className="row">
-                <div className="col-md-4">
-                    <UserForm
-                        handlerAdd={handlerAddUser}
-                        userSelected={userSelected}
-                    />
-                </div>
 
-                {viewMode === "table" ? (
-
-                    <div className="col-md-8">
+            {viewMode === "table" ? (
+                <div className="row">
+                    <div className="col-12">
                         {users.length > 0 ? (
                             <UserTable
                                 users={users}
@@ -113,19 +138,34 @@ export const UsersPage = () => {
                             </div>
                         )}
                     </div>
-                ) : (
-                    <div className="col-md-8">
-                        {users.map(user => (
+                </div>
+            ) : (
+                <div className="row">
+                    {users.length > 0 ? (
+                        users.map(user => (
                             <UserCard
                                 key={user.id}
                                 user={user}
-                                onEdit={() => { }}
-                                onRemove={removeUser}
+                                onEdit={handlerUserSelected}
+                                onRemove={handlerRemoveUser}
                             />
-                        ))}
-                    </div>
-                )}
-            </div>
+                        ))
+                    ) : (
+                        <div className="col-12">
+                            <div className="alert alert-warning">
+                                No hay usuarios
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <UserModal
+                isOpen={isModalOpen}
+                onClose={handlerCloseModal}
+                handlerAdd={handlerAddUser}
+                userSelected={userSelected}
+            />
         </>
     );
 };

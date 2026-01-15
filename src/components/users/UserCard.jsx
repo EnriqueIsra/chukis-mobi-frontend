@@ -1,6 +1,8 @@
+import './userCard.css';
+
 export const UserCard = ({ user, onEdit, onRemove }) => {
   return (
-    <div className="col-md-4 col-lg-3">
+    <div className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-3">
       <div className="card user-card h-100 shadow-sm position-relative">
 
         {/* Hover actions */}

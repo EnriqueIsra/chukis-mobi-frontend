@@ -11,6 +11,7 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
           <th>color</th>
           <th>stock</th>
           <th>price</th>
+          <th>imageUrl</th>
           <th>update</th>
           <th>remove</th>
         </tr>
@@ -25,6 +26,15 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
               <td>{product.color}</td>
               <td>{product.stock}</td>
               <td>${product.price}</td>
+              <td>
+                {product.imageUrl ? (
+                  <a href={product.imageUrl} target="_blank" rel="noopener noreferrer" className="text-truncate d-inline-block" style={{maxWidth: '150px'}}>
+                    {product.imageUrl}
+                  </a>
+                ) : (
+                  <span className="text-muted">Sin imagen</span>
+                )}
+              </td>
               <td><button className="btn btn-sm btn-primary"
               onClick={() => handlerProductSelected(product)} >update</button></td>
               <td><button className="btn btn-sm btn-danger"
