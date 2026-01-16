@@ -11,28 +11,30 @@ export const findAll = async () => {
   }
   return [];
 };
-export const create = async ({ name, description, price, color, stock }) => {
+export const create = async ({ name, description, price, color, stock, imageUrl }) => {
   try {
     return await axios.post(baseUrl, {
       name,
       description,
       price,
       color,
-      stock
+      stock,
+      imageUrl
     });
   } catch (error) {
     console.log(error);
   }
   return undefined;
 };
-export const update = async ({ id, name, description, price, color, stock }) => {
+export const update = async ({ id, name, description, price, color, stock, imageUrl }) => {
   try {
     return await axios.put(`${baseUrl}/${id}`, {
       name,
       description,
       price,
       color,
-      stock
+      stock, 
+      imageUrl
     });
   } catch (error) {
     console.log(error);

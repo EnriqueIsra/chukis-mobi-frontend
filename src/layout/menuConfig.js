@@ -10,6 +10,11 @@ export const menuItems = [
     icon: "bi-box-seam",
   },
   {
+    label: "Clientes",
+    path: "/clients",
+    icon: "bi-person-vcard",
+  },
+  {
     label: "Usuarios",
     path: "/users",
     icon: "bi-people",

@@ -5,6 +5,7 @@ import { LoginPage } from "./auth/LoginPage";
 import { MainLayout } from "./layout/MainLayout";
 import { ProductsPage } from "./pages/ProductsPage";
 import { UsersPage } from "./pages/UsersPage";
+import { ClientsPage } from "./pages/ClientsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 
 export const App = () => {
@@ -46,6 +47,7 @@ export const App = () => {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/clients" element={<ClientsPage />} />
           <Route path="/users" element={<UsersPage />} />
         </Route>
 
