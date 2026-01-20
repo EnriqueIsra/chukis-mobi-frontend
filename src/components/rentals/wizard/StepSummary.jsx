@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { createRental } from "../../../services/rentalService";
+import { createRental, updateRental } from "../../../services/rentalService";
 import Swal from "sweetalert2";
 
-const StepSummary = ({ rentalData, onBack, onFinish }) => {
+const StepSummary = ({ rentalData, onBack, onFinish, isEditMode }) => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
 
@@ -18,28 +18,41 @@ const StepSummary = ({ rentalData, onBack, onFinish }) => {
     setLoading(true);
 
     try {
-      await createRental({
+      const requestData = {
         startDate: rentalData.startDate,
         endDate: rentalData.endDate,
-        clientId: rentalData.clientId,
+        clientId: Number(rentalData.clientId),
+        userId: Number(rentalData.userId),
         address: rentalData.address,
         items: rentalData.items.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity
+          productId: Number(item.productId),
+          quantity: Number(item.quantity)
         }))
-      });
+      };
 
-      Swal.fire({
-        title: "Renta creada",
-        text: "La renta se registró correctamente",
-        icon: "success"
-      });
+      console.log(isEditMode ? "Actualizando renta:" : "Enviando renta:", requestData);
+
+      if (isEditMode) {
+        await updateRental(rentalData.id, requestData);
+        Swal.fire({
+          title: "Renta actualizada",
+          text: "La renta se actualizó correctamente",
+          icon: "success"
+        });
+      } else {
+        await createRental(requestData);
+        Swal.fire({
+          title: "Renta creada",
+          text: "La renta se registró correctamente",
+          icon: "success"
+        });
+      }
 
       onFinish();
     } catch (error) {
       Swal.fire({
         title: "Error",
-        text: "No se pudo registrar la renta" + error,
+        text: isEditMode ? "No se pudo actualizar la renta: " + error : "No se pudo registrar la renta: " + error,
         icon: "error"
       });
     } finally {
@@ -120,7 +133,7 @@ const StepSummary = ({ rentalData, onBack, onFinish }) => {
           onClick={handleConfirm}
           disabled={loading}
         >
-          {loading ? "Guardando..." : "Confirmar Renta"}
+          {loading ? "Guardando..." : (isEditMode ? "Actualizar Renta" : "Confirmar Renta")}
         </button>
       </div>
     </>

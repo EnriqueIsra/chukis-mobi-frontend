@@ -1,17 +1,25 @@
 import { useEffect, useState } from "react";
-import { findAll as findAllProducts } from "../../../services/productService";
+import { getAvailability } from "../../../services/productService";
 import ProductSelectorRow from "./ProductSelectRow";
 
 const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
   const [products, setProducts] = useState([]);
   const [items, setItems] = useState(rentalData.items || []);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    findAllProducts().then((res) => {
-      setProducts(res.data);
-    });
-  }, []);
+    if (rentalData.startDate && rentalData.endDate) {
+      setLoading(true);
+      getAvailability(rentalData.startDate, rentalData.endDate)
+        .then((res) => {
+          if (res && res.data) {
+            setProducts(res.data);
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [rentalData.startDate, rentalData.endDate]);
 
   const addOrUpdateItem = (product, quantity) => {
     if (quantity <= 0) {
@@ -60,27 +68,37 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
-      <table className="table table-sm align-middle">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Precio</th>
-            <th width="120">Cantidad</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <ProductSelectorRow
-              key={product.id}
-              product={product}
-              selectedItem={items.find(
-                (i) => i.productId === product.id
-              )}
-              onChange={addOrUpdateItem}
-            />
-          ))}
-        </tbody>
-      </table>
+      {loading ? (
+        <div className="text-center py-4">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-2 text-muted">Verificando disponibilidad...</p>
+        </div>
+      ) : (
+        <table className="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Disponible</th>
+              <th width="100">Cantidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <ProductSelectorRow
+                key={product.id}
+                product={product}
+                selectedItem={items.find(
+                  (i) => i.productId === product.id
+                )}
+                onChange={addOrUpdateItem}
+              />
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <div className="d-flex justify-content-between mt-4">
         <button className="btn btn-outline-secondary" onClick={onBack}>

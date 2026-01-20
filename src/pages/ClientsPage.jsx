@@ -21,7 +21,9 @@ export const ClientsPage = () => {
 
     const getClients = async () => {
         const result = await findAll()
-        setClients(result.data)
+        if (result && result.data) {
+            setClients(result.data)
+        }
     }
 
     useEffect(() => {

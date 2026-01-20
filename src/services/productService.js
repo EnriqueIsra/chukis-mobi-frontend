@@ -48,3 +48,16 @@ export const remove = async (id) => {
     console.log(error);
   }
 };
+
+// Obtener disponibilidad de productos por fechas
+export const getAvailability = async (startDate, endDate) => {
+  try {
+    const response = await axios.get(`${baseUrl}/availability`, {
+      params: { startDate, endDate }
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+  return null;
+};

@@ -14,6 +14,14 @@ const StepClient = ({ rentalData, setRentalData, onNext, onBack }) => {
     });
   }, []);
 
+  const selectedClient = clients.find((c) => c.id === Number(clientId));
+
+  const handleUseClientAddress = () => {
+    if (selectedClient?.direccion) {
+      setAddress(selectedClient.direccion);
+    }
+  };
+
   const handleNext = () => {
     if (!clientId) {
       setError("Selecciona un cliente");
@@ -50,7 +58,20 @@ const StepClient = ({ rentalData, setRentalData, onNext, onBack }) => {
       </div>
 
       <div className="mb-3">
-        <label className="form-label">Dirección del evento</label>
+        <div className="d-flex justify-content-between align-items-center mb-1">
+          <label className="form-label mb-0">Dirección del evento</label>
+          {selectedClient?.direccion && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-secondary"
+              onClick={handleUseClientAddress}
+              title="Usar dirección del cliente"
+            >
+              <i className="bi bi-geo-alt me-1"></i>
+              Usar dirección del cliente
+            </button>
+          )}
+        </div>
         <textarea
           className="form-control"
           rows="3"

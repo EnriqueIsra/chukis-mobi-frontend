@@ -1,0 +1,103 @@
+.rental-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rental-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Hover actions */
+.rental-card .card-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.rental-card:hover .card-actions {
+  opacity: 1;
+}
+
+.rental-card .card-actions .btn {
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Status badge */
+.rental-status-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+/* Header */
+.rental-card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 40px 16px 16px 16px;
+  text-align: center;
+}
+
+.rental-card-header .rental-id {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.rental-card-header .rental-dates {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Info items */
+.rental-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+.rental-info-item i {
+  width: 18px;
+  text-align: center;
+}
+
+.rental-info-item span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Total */
+.rental-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.rental-total .total-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.rental-total .total-amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #28a745;
+}

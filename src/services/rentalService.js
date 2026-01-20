@@ -25,6 +25,17 @@ export const createRental = async (rentalRequest) => {
   }
 };
 
+// Actualizar renta existente
+export const updateRental = async (id, rentalRequest) => {
+  try {
+    const response = await axios.put(`${baseUrl}/${id}`, rentalRequest);
+    return response;
+  } catch (error) {
+    console.error("Error updating rental:", error);
+    throw error;
+  }
+};
+
 /**
  * Eliminar renta (opcional por ahora)
  */
