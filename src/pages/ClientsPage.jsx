@@ -35,7 +35,7 @@ export const ClientsPage = () => {
             console.log('Update response:', response.data);
             setClients(
                 clients.map(cli => {
-                    if (cli.id == client.id) {
+                    if (cli.id === client.id) {
                         return { ...response.data };
                     }
                     return cli

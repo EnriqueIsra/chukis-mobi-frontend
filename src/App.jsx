@@ -7,6 +7,8 @@ import { ProductsPage } from "./pages/ProductsPage";
 import { UsersPage } from "./pages/UsersPage";
 import { ClientsPage } from "./pages/ClientsPage";
 import { DashboardPage } from "./pages/DashboardPage";
+import { RentalsPage } from "./pages/RentalsPage";
+
 
 export const App = () => {
 
@@ -49,6 +51,8 @@ export const App = () => {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/rentals" element={<RentalsPage />} />
+
         </Route>
 
       </Routes>

@@ -5,6 +5,7 @@ import { uploadFile } from "../../services/fileService";
 const initialDataForm = {
     id: 0,
     username: '',
+    telefono: '',
     role: '',
     password: '',
     imageUrl: ''
@@ -13,19 +14,38 @@ const initialDataForm = {
 export const UserForm = ({ handlerAdd, userSelected, formId = "user-form" }) => {
 
     const [form, setForm] = useState(initialDataForm)
-    const { id, username, role, password, imageUrl } = form;
+    const { id, username, telefono, role, password, imageUrl } = form;
     const [imagePreview, setImagePreview] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         setForm({
             ...initialDataForm,
             ...userSelected,
+            telefono: userSelected.telefono || '',
             imageUrl: userSelected.imageUrl || ''
         })
         setImagePreview(userSelected.imageUrl || null)
     }, [userSelected])
+
+    const validateTelefono = (telefono) => {
+        const telefonoRegex = /^\d{10}$/;
+        return telefonoRegex.test(telefono);
+    };
+
+    const handleTelefonoChange = (e) => {
+        const value = e.target.value.replace(/\D/g, ''); // Solo números
+        if (value.length <= 10) {
+            setForm({ ...form, telefono: value });
+            if (value.length === 10) {
+                setErrors({ ...errors, telefono: null });
+            } else if (value.length > 0) {
+                setErrors({ ...errors, telefono: 'El teléfono debe tener exactamente 10 dígitos' });
+            }
+        }
+    };
 
     const handleFileSelect = async (event) => {
         const file = event.target.files[0];
@@ -67,6 +87,14 @@ export const UserForm = ({ handlerAdd, userSelected, formId = "user-form" }) => 
         id={formId}
         autoComplete="off"
         onSubmit={(event) => {
+
+            // Validaciones
+            const newErrors = {};
+            if (!telefono) {
+                newErrors.telefono = 'El teléfono es requerido';
+            } else if (!validateTelefono(telefono)) {
+                newErrors.telefono = 'El teléfono debe tener exactamente 10 dígitos';
+            }
             event.preventDefault();
             if (!username || !role || !password || !imageUrl) {
                 alert('Debe completear los datos del formulario')
@@ -116,6 +144,20 @@ export const UserForm = ({ handlerAdd, userSelected, formId = "user-form" }) => 
                 value={password}
                 onFocus={(e) => e.target.removeAttribute("readOnly")}
                 onChange={(event) => setForm({ ...form, password: event.target.value })} />
+        </div>
+
+        <div>
+            <input
+                placeholder="Teléfono (10 dígitos)"
+                type="tel"
+                className={`form-control my-3 w-100 ${errors.telefono ? 'is-invalid' : ''}`}
+                name="telefono"
+                value={telefono}
+                onChange={handleTelefonoChange}
+                maxLength="10"
+            />
+            {errors.telefono && <div className="invalid-feedback d-block">{errors.telefono}</div>}
+            {telefono && <small className="text-muted">{telefono.length}/10 dígitos</small>}
         </div>
 
         {/* Image Section */}

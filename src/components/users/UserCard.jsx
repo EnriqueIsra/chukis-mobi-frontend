@@ -39,6 +39,10 @@ export const UserCard = ({ user, onEdit, onRemove }) => {
           <p className="text-muted small mt-2">
             Usuario del sistema ChukisApp
           </p>
+          <div className="user-info-item">
+            <i className="bi bi-telephone-fill text-primary"></i>
+            <span>{user.telefono}</span>
+          </div>
         </div>
 
         {/* Footer */}

@@ -19,4 +19,9 @@ export const menuItems = [
     path: "/users",
     icon: "bi-people",
   },
+  {
+  path: "/rentals",
+  label: "Rentas",
+  icon: "bi-calendar-check"
+}
 ];

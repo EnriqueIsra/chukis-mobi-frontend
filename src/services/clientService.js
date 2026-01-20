@@ -5,7 +5,7 @@ const baseUrl = "http://localhost:8080/api/clients";
 export const findAll = async () => {
   try {
     const response = await axios.get(baseUrl);
-    return response;
+    return response.data;
   } catch (error) {
     console.error(error);
   }

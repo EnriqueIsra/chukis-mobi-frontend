@@ -5,15 +5,14 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
     <table className="table table-hover table-striped">
       <thead>
         <tr>
-          <th>id</th>
-          <th>name</th>
-          <th>description</th>
-          <th>color</th>
-          <th>stock</th>
-          <th>price</th>
-          <th>imageUrl</th>
-          <th>update</th>
-          <th>remove</th>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Color</th>
+          <th>Stock</th>
+          <th>Precio</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
         </tr>
       </thead>
       <tbody>
@@ -26,15 +25,6 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
               <td>{product.color}</td>
               <td>{product.stock}</td>
               <td>${product.price}</td>
-              <td>
-                {product.imageUrl ? (
-                  <a href={product.imageUrl} target="_blank" rel="noopener noreferrer" className="text-truncate d-inline-block" style={{maxWidth: '150px'}}>
-                    {product.imageUrl}
-                  </a>
-                ) : (
-                  <span className="text-muted">Sin imagen</span>
-                )}
-              </td>
               <td><button className="btn btn-sm btn-primary"
               onClick={() => handlerProductSelected(product)} >update</button></td>
               <td><button className="btn btn-sm btn-danger"

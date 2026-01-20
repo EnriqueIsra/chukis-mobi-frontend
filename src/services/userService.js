@@ -11,10 +11,11 @@ export const findAllUsers = async () => {
   }
   return [];
 };
-export const createUser = async ({ username, role, password, imageUrl }) => {
+export const createUser = async ({ username, telefono, role, password, imageUrl }) => {
   try {
     return await axios.post(baseUrl, {
       username,
+      telefono, 
       role,
       password,
       imageUrl
@@ -24,10 +25,11 @@ export const createUser = async ({ username, role, password, imageUrl }) => {
   }
   return undefined;
 };
-export const updateUser = async ({ id, username, role, password, imageUrl }) => {
+export const updateUser = async ({ id, username, telefono, role, password, imageUrl }) => {
   try {
     return await axios.put(`${baseUrl}/${id}`, {
       username,
+      telefono, 
       role,
       password,
       imageUrl

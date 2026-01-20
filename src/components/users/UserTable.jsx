@@ -5,12 +5,12 @@ export const UserTable = ({ users, handlerUserSelected, handlerRemoveUser }) => 
     <table className="table table-hover table-striped">
       <thead>
         <tr>
-          <th>id</th>
-          <th>usuario</th>
-          <th>rol</th>
-          <th>imagen</th>
-          <th>editar</th>
-          <th>eliminar</th>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Rol</th>
+          <th>Teléfono</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
         </tr>
       </thead>
       <tbody>
@@ -20,7 +20,10 @@ export const UserTable = ({ users, handlerUserSelected, handlerRemoveUser }) => 
               <td>{user.id}</td>
               <td>{user.username}</td>
               <td>{user.role}</td>
-              <td>{user.imageUrl}</td>
+              <td>
+                <i className="bi bi-telephone me-1"></i>
+                {user.telefono}
+              </td>
               <td><button className="btn btn-sm btn-primary"
               onClick={() => handlerUserSelected(user)} >editar</button></td>
               <td><button className="btn btn-sm btn-danger"
