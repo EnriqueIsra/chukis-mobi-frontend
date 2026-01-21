@@ -5,7 +5,7 @@ const statusConfig = {
   CANCELLED: { label: 'Cancelada', class: 'bg-danger' }
 };
 
-const RentalTable = ({ rentals, onView, onEdit, onDelete }) => {
+const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCancel }) => {
   return (
     <table className="table table-bordered table-hover">
       <thead className="table-light">
@@ -75,6 +75,23 @@ const RentalTable = ({ rentals, onView, onEdit, onDelete }) => {
                     title="Ver detalles"
                   >
                     <i className="bi bi-eye"></i>
+                  </button>
+                  {rental.status === 'CREATED' && (
+                    <button
+                      className="btn btn-sm btn-outline-secondary"
+                      onClick={() => onChangeStatus(rental)}
+                      title="Cambiar estado"
+                    >
+                      <i className="bi bi-arrow-repeat"></i>
+                    </button>
+                  )}
+
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => onCancel(rental)}
+                    title="Cancelar"
+                  >
+                    <i className="bi bi-x-circle"></i>
                   </button>
                   <button
                     className="btn btn-sm btn-outline-warning"

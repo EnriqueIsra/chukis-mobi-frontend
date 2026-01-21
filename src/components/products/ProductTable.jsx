@@ -26,9 +26,9 @@ export const ProductTable = ({ products, handlerProductSelected, handlerRemovePr
               <td>{product.stock}</td>
               <td>${product.price}</td>
               <td><button className="btn btn-sm btn-primary"
-              onClick={() => handlerProductSelected(product)} >update</button></td>
+              onClick={() => handlerProductSelected(product)} ><i className="bi bi-pencil"></i></button></td>
               <td><button className="btn btn-sm btn-danger"
-              onClick={() => handlerRemoveProduct(product.id)}>remove</button></td>
+              onClick={() => handlerRemoveProduct(product.id)}><i className="bi bi-trash"></i></button></td>
             </tr>
           )
         })}

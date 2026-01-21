@@ -4,7 +4,7 @@ import { RentalsToolbar } from "../components/rentals/RentalToolBar";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
-import { findAll, remove } from "../services/rentalService";
+import { findAll, remove, updateRentalStatus } from "../services/rentalService";
 
 export const RentalsPage = () => {
   const [rentals, setRentals] = useState([]);
@@ -99,6 +99,72 @@ export const RentalsPage = () => {
     }
   };
 
+  const handlerChangeStatus = (rental) => {
+    Swal.fire({
+      title: 'Declarar esta renta como:',
+      html: `
+      <div class="d-flex flex-column gap-2">
+        <button id="deliveredBtn" class="btn btn-warning">
+          <i class="bi bi-truck me-1"></i> Entregada
+        </button>
+        <button id="pickedUpBtn" class="btn btn-success">
+          <i class="bi bi-check-circle me-1"></i> Recogida
+        </button>
+      </div>
+    `,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonText: 'Cerrar',
+      didOpen: () => {
+        document
+          .getElementById('deliveredBtn')
+          ?.addEventListener('click', async () => {
+            await changeStatus(rental.id, 'DELIVERED');
+          });
+
+        document
+          .getElementById('pickedUpBtn')
+          ?.addEventListener('click', async () => {
+            await changeStatus(rental.id, 'PICKED_UP');
+          });
+      }
+    });
+  };
+
+  const changeStatus = async (id, status) => {
+    try {
+      await updateRentalStatus(id, status);
+      Swal.fire('Actualizado', 'El estado fue actualizado correctamente', 'success');
+      getRentals(); // refresca lista
+    } catch (error) {
+      Swal.fire('Error', 'No se pudo cambiar el estado', 'error');
+    }
+  };
+
+
+  const handlerCancelRental = async (rental) => {
+    const result = await Swal.fire({
+      title: '¿Cancelar renta?',
+      text: 'La renta será marcada como cancelada',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc3545',
+      confirmButtonText: 'Sí, cancelar',
+      cancelButtonText: 'Volver'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await updateRentalStatus(rental.id, 'CANCELLED');
+        Swal.fire('Cancelada', 'La renta fue cancelada', 'success');
+        getRentals();
+      } catch {
+        Swal.fire('Error', 'No se pudo cancelar la renta', 'error');
+      }
+    }
+  };
+
+
   return (
     <>
       {/* Header */}
@@ -128,6 +194,8 @@ export const RentalsPage = () => {
           onView={handlerViewRental}
           onEdit={handlerEditRental}
           onDelete={handlerDeleteRental}
+          onChangeStatus={handlerChangeStatus}
+          onCancel={handlerCancelRental}
         />
       ) : (
         <div className="row">
@@ -143,6 +211,8 @@ export const RentalsPage = () => {
                 onView={handlerViewRental}
                 onEdit={handlerEditRental}
                 onDelete={handlerDeleteRental}
+                onChangeStatus={handlerChangeStatus}
+                onCancel={handlerCancelRental}
               />
             ))
           )}

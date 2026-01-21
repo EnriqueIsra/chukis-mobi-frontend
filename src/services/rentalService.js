@@ -47,3 +47,20 @@ export const remove = async (id) => {
     throw error;
   }
 };
+
+// Cambiar solo el status de la renta
+export const updateRentalStatus = async (id, status) => {
+  try {
+    const response = await axios.put(
+      `${baseUrl}/${id}/status`,
+      null,
+      {
+        params: { status },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating rental status:", error);
+    throw error;
+  }
+};

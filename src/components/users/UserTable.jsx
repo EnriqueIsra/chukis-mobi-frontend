@@ -25,9 +25,9 @@ export const UserTable = ({ users, handlerUserSelected, handlerRemoveUser }) => 
                 {user.telefono}
               </td>
               <td><button className="btn btn-sm btn-primary"
-              onClick={() => handlerUserSelected(user)} >editar</button></td>
+              onClick={() => handlerUserSelected(user)} ><i className="bi bi-pencil"></i></button></td>
               <td><button className="btn btn-sm btn-danger"
-              onClick={() => handlerRemoveUser(user.id)}>eliminar</button></td>
+              onClick={() => handlerRemoveUser(user.id)}><i className="bi bi-trash"></i></button></td>
             </tr>
           )
         })}
