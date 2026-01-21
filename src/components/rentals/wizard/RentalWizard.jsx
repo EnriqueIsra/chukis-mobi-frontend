@@ -6,14 +6,46 @@ import StepSummary from "./StepSummary";
 
 const STEPS = ["Fechas", "Productos", "Cliente", "Resumen"];
 
-export const RentalWizard = ({ onClose, onSuccess, userId, rentalToEdit }) => {
+export const RentalWizard = ({ onClose, onSuccess, userId, rentalToEdit, initialDate }) => {
   const isEditMode = !!rentalToEdit;
+
+  // Calcular fechas iniciales
+  const getInitialDates = () => {
+    if (rentalToEdit) {
+      return {
+        startDate: rentalToEdit.startDate || "",
+        endDate: rentalToEdit.endDate || ""
+      };
+    }
+
+    if (initialDate) {
+      // Si es un objeto con start y end (selección de rango)
+      if (typeof initialDate === 'object' && initialDate.start) {
+        return {
+          startDate: initialDate.start,
+          endDate: initialDate.end
+        };
+      }
+      // Si es una fecha simple (click en día)
+      const dateStr = typeof initialDate === 'string' ? initialDate : "";
+      if (dateStr) {
+        return {
+          startDate: `${dateStr.split('T')[0]}T10:00`,
+          endDate: `${dateStr.split('T')[0]}T18:00`
+        };
+      }
+    }
+
+    return { startDate: "", endDate: "" };
+  };
+
+  const initialDates = getInitialDates();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [rentalData, setRentalData] = useState({
     id: rentalToEdit?.id || null,
-    startDate: rentalToEdit?.startDate || "",
-    endDate: rentalToEdit?.endDate || "",
+    startDate: initialDates.startDate,
+    endDate: initialDates.endDate,
     items: rentalToEdit?.items?.map(item => ({
       productId: item.productId,
       name: item.productName,

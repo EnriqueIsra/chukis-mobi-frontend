@@ -8,6 +8,7 @@ import { UsersPage } from "./pages/UsersPage";
 import { ClientsPage } from "./pages/ClientsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { RentalsPage } from "./pages/RentalsPage";
+import { CalendarPage } from "./pages/CalendarPage";
 
 
 export const App = () => {
@@ -52,6 +53,7 @@ export const App = () => {
           <Route path="/clients" element={<ClientsPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/rentals" element={<RentalsPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
 
         </Route>
 

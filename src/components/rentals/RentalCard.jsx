@@ -7,6 +7,18 @@ const statusConfig = {
   CANCELLED: { label: 'Cancelada', class: 'bg-danger', icon: 'bi-x-circle' }
 };
 
+// Formatear fecha y hora de forma compacta: "15/01 10:00"
+const formatDateTimeShort = (dateTimeStr) => {
+  if (!dateTimeStr) return 'N/A';
+  const date = new Date(dateTimeStr);
+  return date.toLocaleString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, onCancel }) => {
   const status = statusConfig[rental.status] || statusConfig.CREATED;
 
@@ -88,7 +100,7 @@ export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, o
           <div className="rental-id">#{rental.id}</div>
           <div className="rental-dates">
             <i className="bi bi-calendar-range me-1"></i>
-            {rental.startDate} - {rental.endDate}
+            {formatDateTimeShort(rental.startDate)} - {formatDateTimeShort(rental.endDate)}
           </div>
         </div>
 
@@ -98,6 +110,12 @@ export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, o
           <div className="rental-info-item">
             <i className="bi bi-person-fill text-primary"></i>
             <span className="fw-semibold">{rental.client?.name || 'Sin cliente'}</span>
+          </div>
+
+          {/* Telefono */}
+          <div className="rental-info-item">
+            <i className="bi bi-telephone-fill text-primary"></i>
+            <span className="text-truncate">{rental.client?.phone || 'Sin teléfono'}</span>
           </div>
 
           {/* Dirección */}

@@ -1,0 +1,339 @@
+/* ========================================
+   CALENDARIO DE RENTAS - ESTILOS
+   ======================================== */
+
+.calendar-page {
+  padding: 0;
+}
+
+/* Leyenda de colores */
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.legend-title {
+  font-weight: 600;
+  color: #495057;
+  margin-right: 8px;
+}
+
+.legend-item {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* Contenedor del calendario */
+.calendar-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* ========================================
+   FULLCALENDAR CUSTOMIZATION
+   ======================================== */
+
+/* Header del calendario */
+.fc .fc-toolbar {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2c3e50;
+  text-transform: capitalize;
+}
+
+/* Botones de navegación */
+.fc .fc-button {
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.fc .fc-button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #212529;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+.fc .fc-button-primary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Today button */
+.fc .fc-today-button {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
+.fc .fc-today-button:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+.fc .fc-today-button:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+}
+
+/* Celdas del calendario */
+.fc .fc-daygrid-day {
+  transition: background-color 0.15s ease;
+}
+
+.fc .fc-daygrid-day:hover {
+  background-color: #f8f9fa;
+}
+
+.fc .fc-day-today {
+  background-color: rgba(13, 110, 253, 0.08) !important;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  background-color: #0d6efd;
+  color: #fff;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px;
+}
+
+/* Números de día */
+.fc .fc-daygrid-day-number {
+  padding: 8px;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Headers de días */
+.fc .fc-col-header-cell {
+  background-color: #f8f9fa;
+  padding: 12px 8px;
+}
+
+.fc .fc-col-header-cell-cushion {
+  color: #495057;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   EVENTOS
+   ======================================== */
+
+.fc-event {
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-width: 0 0 0 3px !important;
+}
+
+.fc-event:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10 !important;
+}
+
+/* Eventos en vista de tiempo (semana/día) */
+.fc-timegrid-event {
+  border-radius: 6px;
+  padding: 4px 8px;
+  border-left-width: 4px !important;
+}
+
+.fc-timegrid-event .fc-event-main {
+  padding: 2px;
+}
+
+.fc-timegrid-event .fc-event-title {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-timegrid-event .fc-event-time {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Eventos empalmados - mostrar uno al lado del otro */
+.fc-timegrid-event-harness {
+  margin-right: 2px !important;
+}
+
+/* "+X más" link */
+.fc .fc-more-link {
+  color: #0d6efd;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.fc .fc-more-link:hover {
+  color: #0a58ca;
+  text-decoration: underline;
+}
+
+/* Popover de más eventos */
+.fc .fc-popover {
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+.fc .fc-popover-header {
+  background-color: #f8f9fa;
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
+/* ========================================
+   VISTA DE TIEMPO (Semana/Día)
+   ======================================== */
+
+.fc .fc-timegrid-slot {
+  height: 48px;
+}
+
+.fc .fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #dc3545;
+  border-width: 2px;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #dc3545;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* ========================================
+   MODAL DE RENTA
+   ======================================== */
+
+.rental-modal-content {
+  text-align: left;
+}
+
+.rental-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.rental-modal-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .fc .fc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .fc .fc-toolbar-title {
+    font-size: 1.1rem;
+  }
+
+  .fc .fc-button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+
+  .calendar-legend {
+    justify-content: center;
+  }
+
+  .legend-item {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+
+  .rental-modal-actions {
+    flex-direction: column;
+  }
+
+  .rental-modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  }
+}
+
+.fc .fc-day-today {
+  animation: pulse 2s infinite;
+}
+
+/* Transición suave al cambiar de vista */
+.fc-view-harness {
+  transition: height 0.3s ease;
+}

@@ -5,6 +5,19 @@ const statusConfig = {
   CANCELLED: { label: 'Cancelada', class: 'bg-danger' }
 };
 
+// Formatear fecha y hora: "2024-01-15T10:00:00" -> "15/01/2024 10:00"
+const formatDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return 'N/A';
+  const date = new Date(dateTimeStr);
+  return date.toLocaleString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCancel }) => {
   return (
     <table className="table table-bordered table-hover">
@@ -41,11 +54,14 @@ const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCanc
                 <small className="text-muted">{rental.client?.phone}</small>
               </td>
               <td>
-                <i className="bi bi-calendar me-1 text-primary"></i>
-                {rental.startDate}
-                <br />
-                <i className="bi bi-calendar-check me-1 text-success"></i>
-                {rental.endDate}
+                <div>
+                  <i className="bi bi-calendar me-1 text-primary"></i>
+                  {formatDateTime(rental.startDate)}
+                </div>
+                <div>
+                  <i className="bi bi-calendar-check me-1 text-success"></i>
+                  {formatDateTime(rental.endDate)}
+                </div>
               </td>
               <td className="text-truncate" style={{ maxWidth: '200px' }}>
                 {rental.address}

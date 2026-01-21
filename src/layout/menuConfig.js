@@ -20,8 +20,13 @@ export const menuItems = [
     icon: "bi-people",
   },
   {
-  path: "/rentals",
-  label: "Rentas",
-  icon: "bi-calendar-check"
-}
+    path: "/rentals",
+    label: "Rentas",
+    icon: "bi-receipt"
+  },
+  {
+    path: "/calendar",
+    label: "Calendario",
+    icon: "bi-calendar3"
+  }
 ];

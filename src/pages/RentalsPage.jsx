@@ -6,6 +6,19 @@ import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
 import { findAll, remove, updateRentalStatus } from "../services/rentalService";
 
+// Formatear fecha y hora: "2024-01-15T10:00:00" -> "15/01/2024 10:00"
+const formatDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return 'N/A';
+  const date = new Date(dateTimeStr);
+  return date.toLocaleString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 export const RentalsPage = () => {
   const [rentals, setRentals] = useState([]);
   const [viewMode, setViewMode] = useState("table");
@@ -60,7 +73,8 @@ export const RentalsPage = () => {
         <div class="text-start">
           <p><strong>Cliente:</strong> ${rental.client?.name || 'N/A'}</p>
           <p><strong>Teléfono:</strong> ${rental.client?.phone || 'N/A'}</p>
-          <p><strong>Fechas:</strong> ${rental.startDate} - ${rental.endDate}</p>
+          <p><strong>Inicio:</strong> ${formatDateTime(rental.startDate)}</p>
+          <p><strong>Fin:</strong> ${formatDateTime(rental.endDate)}</p>
           <p><strong>Dirección:</strong> ${rental.address}</p>
           <p><strong>Creado por:</strong> ${rental.user?.username || 'N/A'}</p>
           <hr/>
