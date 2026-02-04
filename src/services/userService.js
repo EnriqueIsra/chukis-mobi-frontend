@@ -1,10 +1,9 @@
-import axios from "axios";
+import axiosInstance from "./axiosConfig";
 
-const baseUrl = "http://localhost:8080/api/users";
 
 export const findAllUsers = async () => {
   try {
-    const response = await axios.get(baseUrl);
+    const response = await axiosInstance.get("/users");
     return response;
   } catch (error) {
     console.log(error);
@@ -13,7 +12,7 @@ export const findAllUsers = async () => {
 };
 export const createUser = async ({ username, telefono, role, password, imageUrl }) => {
   try {
-    return await axios.post(baseUrl, {
+    return await axiosInstance.post("/users", {
       username,
       telefono, 
       role,
@@ -27,7 +26,7 @@ export const createUser = async ({ username, telefono, role, password, imageUrl 
 };
 export const updateUser = async ({ id, username, telefono, role, password, imageUrl }) => {
   try {
-    return await axios.put(`${baseUrl}/${id}`, {
+    return await axiosInstance.put(`/users/${id}`, {
       username,
       telefono, 
       role,
@@ -41,7 +40,7 @@ export const updateUser = async ({ id, username, telefono, role, password, image
 };
 export const removeUser = async (id) => {
   try {
-    await axios.delete(`${baseUrl}/${id}`);
+    await axiosInstance.delete(`/users/${id}`);
   } catch (error) {
     console.log(error);
   }

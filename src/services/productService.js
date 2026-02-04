@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const baseUrl = "http://localhost:8080/api/products";
+import axiosInstance from "./axiosConfig";
 
 export const findAll = async () => {
   try {
-    const response = await axios.get(baseUrl);
+    const response = await axiosInstance.get("/products");
     return response;
   } catch (error) {
     console.log(error);
@@ -13,7 +11,7 @@ export const findAll = async () => {
 };
 export const create = async ({ name, description, price, color, stock, imageUrl }) => {
   try {
-    return await axios.post(baseUrl, {
+    return await axiosInstance.post("/products", {
       name,
       description,
       price,
@@ -28,7 +26,7 @@ export const create = async ({ name, description, price, color, stock, imageUrl 
 };
 export const update = async ({ id, name, description, price, color, stock, imageUrl }) => {
   try {
-    return await axios.put(`${baseUrl}/${id}`, {
+    return await axiosInstance.put(`/products/${id}`, {
       name,
       description,
       price,
@@ -43,7 +41,7 @@ export const update = async ({ id, name, description, price, color, stock, image
 };
 export const remove = async (id) => {
   try {
-    await axios.delete(`${baseUrl}/${id}`);
+    await axiosInstance.delete(`/products/${id}`);
   } catch (error) {
     console.log(error);
   }
@@ -52,7 +50,7 @@ export const remove = async (id) => {
 // Obtener disponibilidad de productos por fechas
 export const getAvailability = async (startDate, endDate) => {
   try {
-    const response = await axios.get(`${baseUrl}/availability`, {
+    const response = await axiosInstance.get(`/products/availability`, {
       params: { startDate, endDate }
     });
     return response;

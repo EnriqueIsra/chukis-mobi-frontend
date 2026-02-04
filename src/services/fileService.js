@@ -1,13 +1,11 @@
-import axios from "axios";
-
-const baseUrl = "http://localhost:8080/api/files";
+import axiosInstance from "./axiosConfig";
 
 export const uploadFile = async (file) => {
   try {
     const formData = new FormData();
     formData.append("file", file);
 
-    const response = await axios.post(`${baseUrl}/upload`, formData, {
+    const response = await axiosInstance.post(`/files/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
