@@ -1,9 +1,12 @@
-import axios from "axios";
+// Usamos nuestra instancia configurada de axios
+import axiosInstance from "./axiosConfig";
 
-const BASE_URL = "http://localhost:8080/api/auth";
-
+/* 
+  Servicio de autenticación
+  El endpoint /auth/login está permitido sin token en SecurityConfig
+  Retorna: {token, id, username, role, imageUrl, telefono} */
 export const login = (username, password) => {
-  return axios.post(`${BASE_URL}/login`, {
+  return axiosInstance.post("/auth/login", {
     username,
     password
   });

@@ -1,12 +1,9 @@
-import axios from "axios";
-
-const baseUrl = "http://localhost:8080/api/rentals";
-
+import axiosInstance from "./axiosConfig";
 
 // Obtener todas las rentas
 export const findAll = async () => {
   try {
-    const response = await axios.get(baseUrl);
+    const response = await axiosInstance.get("/rentals");
     return response;
   } catch (error) {
     console.error(error);
@@ -17,7 +14,7 @@ export const findAll = async () => {
 // Crear renta (wizard completo)
 export const createRental = async (rentalRequest) => {
   try {
-    const response = await axios.post(baseUrl, rentalRequest);
+    const response = await axiosInstance.post("/rentals", rentalRequest);
     return response;
   } catch (error) {
     console.error("Error creating rental:", error);
@@ -28,7 +25,7 @@ export const createRental = async (rentalRequest) => {
 // Actualizar renta existente
 export const updateRental = async (id, rentalRequest) => {
   try {
-    const response = await axios.put(`${baseUrl}/${id}`, rentalRequest);
+    const response = await axiosInstance.put(`/rentals/${id}`, rentalRequest);
     return response;
   } catch (error) {
     console.error("Error updating rental:", error);
@@ -41,7 +38,7 @@ export const updateRental = async (id, rentalRequest) => {
  */
 export const remove = async (id) => {
   try {
-    await axios.delete(`${baseUrl}/${id}`);
+    await axiosInstance.delete(`/rentals/${id}`);
   } catch (error) {
     console.error("Error deleting rental:", error);
     throw error;
@@ -51,8 +48,8 @@ export const remove = async (id) => {
 // Cambiar solo el status de la renta
 export const updateRentalStatus = async (id, status) => {
   try {
-    const response = await axios.put(
-      `${baseUrl}/${id}/status`,
+    const response = await axiosInstance.put(
+      `/rentals/${id}/status`,
       null,
       {
         params: { status },

@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const baseUrl = "http://localhost:8080/api/clients";
+import axiosInstance from "./axiosConfig";
 
 export const findAll = async () => {
   try {
-    const response = await axios.get(baseUrl);
+    const response = await axiosInstance.get("/clients");
     return response;
   } catch (error) {
     console.error(error);
@@ -14,7 +12,7 @@ export const findAll = async () => {
 
 export const create = async ({ nombre, telefono, direccion, email }) => {
   try {
-    return await axios.post(baseUrl, {
+    return await axiosInstance.post("/clients", {
       nombre,
       telefono,
       direccion,
@@ -28,7 +26,7 @@ export const create = async ({ nombre, telefono, direccion, email }) => {
 
 export const update = async ({ id, nombre, telefono, direccion, email }) => {
   try {
-    return await axios.put(`${baseUrl}/${id}`, {
+    return await axiosInstance.put(`/clients/${id}`, {
       nombre,
       telefono,
       direccion,
@@ -42,7 +40,7 @@ export const update = async ({ id, nombre, telefono, direccion, email }) => {
 
 export const remove = async (id) => {
   try {
-    await axios.delete(`${baseUrl}/${id}`);
+    await axiosInstance.delete(`/clients/${id}`);
   } catch (error) {
     console.error(error);
   }
