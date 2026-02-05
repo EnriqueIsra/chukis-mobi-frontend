@@ -1,0 +1,79 @@
+/* tarjeta de estadística */
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    border: none;
+    border-radius: 12px;
+}
+
+.stat-card.clickable {
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Header con gradiente morado */
+.stat-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+/* Círculo del icono */
+.stat-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.stat-icon-wrapper i {
+    font-size: 1.75rem;
+    color: white;
+}
+
+/* Valor principal */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+/* Título descriptivo */
+.stat-title {
+    font-size: 0.95rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Colores para los valores */
+.stat-value.text-warning {
+    color: #ffc107 !important;
+}
+
+.stat-value.text-info {
+    color: #0dcaf0 !important;
+}
+
+.stat-value.text-success {
+    color: #198754 !important;
+}
+
+/* Animación de rotación para el botón actualizar */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {transform: rotate(0deg); }
+    to {transform: rotate(360deg);}
+}
