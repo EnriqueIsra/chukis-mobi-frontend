@@ -19,7 +19,19 @@ const formatDateTimeShort = (dateTimeStr) => {
   });
 };
 
-export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, onCancel }) => {
+// Agregamos onPayment a la lista de props
+// Las props son las funciones que el componente padre
+// (RentalsPage) nos pasa para manejar acciones.
+// onPayment es la función para abrir el modal de pagos
+export const RentalCard = ({ 
+  rental, 
+  onView, 
+  onEdit, 
+  onDelete, 
+  onChangeStatus, 
+  onCancel,
+  onPayment // prop para manejar pagos  
+}) => {
   const status = statusConfig[rental.status] || statusConfig.CREATED;
 
   const handleView = (e) => {
@@ -36,6 +48,17 @@ export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, o
     e.stopPropagation();
     onDelete(rental.id);
   };
+
+  // Handler para el botón de pagos
+  // e.stopPropagation() evita que el clic se propague
+  // al contenedor padre (la tarjeta). Sin esto, si la 
+  // tarjeta tuviera un onClick, también se ejecutaría
+  // Luego llamamos a onPayment(rental) pasándole la renta
+  // completa para que RentalsPage sepa qué renta abrir
+  const handlePayment = (e) => {
+    e.stopPropagation() // Evita que el clic se propague
+    onPayment(rental)   // LLama al handler del padre con la renta
+  }
 
   return (
     <div className="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
@@ -60,6 +83,20 @@ export const RentalCard = ({ rental, onView, onEdit, onDelete, onChangeStatus, o
               title="Cambiar estado"
             >
               <i className="bi bi-arrow-repeat"></i>
+            </button>
+          )}
+
+          {/* Botón de pagos
+          Condición: rental.status !== 'CANCELLED'
+          - Solo mostramos el botón si la renta NO está cancelada
+          - No tiene sentido registrar pagos de rentas canceladas */}
+          {rental.status !== 'CANCELLED' && (
+            <button
+              className='btn btn-sm btn-success'
+              onClick={handlePayment}
+              title='Registrar pago'
+            >
+              <i className='bi bi-cash-coin'></i>
             </button>
           )}
 

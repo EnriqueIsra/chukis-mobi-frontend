@@ -18,7 +18,18 @@ const formatDateTime = (dateTimeStr) => {
   });
 };
 
-const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCancel }) => {
+// Agregamos onPayment a las props
+// Igual que en RentalCard, recibimos esta función
+// del padre (RentalsPage) para manejar la acción de pagos
+const RentalTable = ({ 
+  rentals, 
+  onView, 
+  onEdit, 
+  onDelete, 
+  onChangeStatus, 
+  onCancel,
+  onPayment // prop para manejar pagos
+ }) => {
   return (
     <table className="table table-bordered table-hover">
       <thead className="table-light">
@@ -31,7 +42,8 @@ const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCanc
           <th>Total</th>
           <th>Estado</th>
           <th>Creado por</th>
-          <th width="130">Acciones</th>
+          {/* Aumentamos en ancho de la columna de acciones de 130 a 160 para que quepa el botón de pagos sin que se vea apretado */}
+          <th width="160">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -84,7 +96,8 @@ const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCanc
                 </small>
               </td>
               <td>
-                <div className="d-flex gap-1">
+                {/* Agregamos flex-wrap para que los botones puedan bajar a otra línea si no caben todos en una sola fila */}
+                <div className="d-flex gap-1 flex-wrap">
                   <button
                     className="btn btn-sm btn-outline-primary"
                     onClick={() => onView(rental)}
@@ -99,6 +112,23 @@ const RentalTable = ({ rentals, onView, onEdit, onDelete, onChangeStatus, onCanc
                       title="Cambiar estado"
                     >
                       <i className="bi bi-arrow-repeat"></i>
+                    </button>
+                  )}
+
+                  {/* Botón de pagos en la tabla
+                  Condición: rental.status !== 'CANCELLED'
+                  - Solo aparece si la renta no está cancelada
+                  onClick: LLamamos directamente a onPayment(rental)
+                  - No necesitamos e.stopPropagation() aquí porque
+                    la fila de la tabla no tiene onClick */}
+
+                  {rental.status !== 'CANCELLED' && (
+                    <button
+                      className="btn btn-sm btn-outline-success"
+                      onClick={() => onPayment(rental)}
+                      title="Registrar pago"
+                    >
+                      <i className="bi bi-cash-coin"></i>
                     </button>
                   )}
 

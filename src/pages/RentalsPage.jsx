@@ -5,6 +5,7 @@ import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
 import { findAll, remove, updateRentalStatus } from "../services/rentalService";
+import PaymentModal from "../components/payments/PaymentModal"  // Importamos el componente PaymentModal
 
 // Formatear fecha y hora: "2024-01-15T10:00:00" -> "15/01/2024 10:00"
 const formatDateTime = (dateTimeStr) => {
@@ -25,6 +26,13 @@ export const RentalsPage = () => {
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [rentalToEdit, setRentalToEdit] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Estado para controlar el modal de pagos. 
+  // paymentRental guarda la renta seleccionada para pagos, 
+  // - si es null: el modal está cerrado, 
+  // - si tiene una renta: el modal está abierto mostrando esa renta. 
+  // Usamos la renta completa no solo el id porque el modal necesita mostrar informacion como el total de la renta
+  const [paymentRental, setPaymentRental] = useState(null);
 
   // Obtener el usuario logueado del localStorage
   const loggedUser = JSON.parse(localStorage.getItem("user"));
@@ -178,6 +186,28 @@ export const RentalsPage = () => {
     }
   };
 
+  // Handler para ABRIR el modal de pagos
+  // Recibe el objeto rental completo desde RentalCard o RentalTable
+  // Al hacer serPaymentRental(rental), React re-renderiza y el modal se muestra porque paymentRental ya no es null
+  const handlerOpenPayment = (rental) => {
+    setPaymentRental(rental)
+  }
+
+  // Handler para cerrar el modal de pagos
+  // Al hacer setPaymentRental(null), react re-renderiza y 
+  // el modal se oculta porque la condición {paymentRental && ...}
+  // es falsa cuando paymentRental es null
+  const handlerClosePayment = () => {
+    setPaymentRental(null)
+  } 
+
+  // Callback cuando se crea un pago exitosamente
+  // Este callback se ejecuta desde PaymentModal después de registrar un pago. 
+  // Llamamos a getRentals() para recargar la lista de rentas y que se actualicen 
+  // los totales en las tarjetas/tabla si en el futuro mostramos el saldo
+  const handlerPaymentCreated = () => {
+    getRentals()
+  }
 
   return (
     <>
@@ -210,6 +240,10 @@ export const RentalsPage = () => {
           onDelete={handlerDeleteRental}
           onChangeStatus={handlerChangeStatus}
           onCancel={handlerCancelRental}
+          // Pasamos el handler de los pagos a RentalTable
+          // Cuando el usuario haga clic en el botón de pagos
+          // en la tabla, se ejecutará handlerOpenPayment
+          onPayment={handlerOpenPayment}
         />
       ) : (
         <div className="row">
@@ -227,6 +261,11 @@ export const RentalsPage = () => {
                 onDelete={handlerDeleteRental}
                 onChangeStatus={handlerChangeStatus}
                 onCancel={handlerCancelRental}
+                // Pasamos el handler de pagos a RentalCard
+                // Igual que con RentalTable, cuando el usuario
+                // haga clic en el botón de pagos en la tarjeta,
+                // se ejecutará handlerOpenPayment
+                onPayment={handlerOpenPayment}
               />
             ))
           )}
@@ -240,6 +279,22 @@ export const RentalsPage = () => {
           onSuccess={handlerSuccess}
           userId={userId}
           rentalToEdit={rentalToEdit}
+        />
+      )}
+
+      {/* Renderizado condicional del PaymentModal
+      {paymentRental && ...} significa:
+      - Si paymentRental tiene valor (no es null) -> renderiza el modal
+      - Si paymentRental es null -> no renderiza nada
+      Props que le pasamos
+      - rental: La renta seleccionada (para mostrar su info y total)
+      - onClose: Función para cerrar el modal
+      - onPaymentCreated: Callback para recargar datos después de un pago */}
+      {paymentRental && (
+        <PaymentModal
+          rental={paymentRental}
+          onClose={handlerClosePayment}
+          onPaymentCreated={handlerPaymentCreated}
         />
       )}
     </>

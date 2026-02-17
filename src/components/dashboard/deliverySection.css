@@ -1,0 +1,55 @@
+/* Contenedor principal de la sección */
+.delivery-section {
+    border: none;
+    border-radius: 12px;
+}
+
+/* Lista de entregas con scroll
+    max-height: limita la altura para que no crezca infinito
+    overflow-y: auto: agrega scroll vertical si hay muchas entregas */
+.delivery-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Cada item de entrega individual
+    border-left: línea azul a la izquierda como identificador visual
+    transition: animación suave al hacer hover */
+.delivery-item {
+    padding: 12px;
+    border-left: 3px solid #667eea;
+    background-color: #f8f9fa;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 10px;
+    transition: background-color 0.2s ease;
+}
+
+/* Al pasar el mouse se aclara el fondo */
+.delivery-item:hover {
+    background-color: #e9ecef;
+}
+
+/* Sección de pagos dentro de cada item
+    border-top: línea separadora sutil */
+.delivery-payment {
+    padding-top: 8px;
+    border-top: 1px dashed #dee2e6;
+}
+
+/* Color naranja personalizao para la barra de progreso
+    Bootstrap no tiene bg-orange por defecto, así que lo definimos nosotros para el rango 1-49% */
+.bg-orange {
+    background-color: #fd7e14 !important;
+}
+
+/* Personalización de las pestañas (tabs)
+    Cuando una pestaña está activa usa el gradiente morado del dashboard (mismo que los StatCard) */
+.delivery-section .nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+/* Pestañas inactivas en color gris */
+.delivery-section .nav-pills .nav-link:hover:not(.active) {
+    background-color: #f0f0f0;
+}
