@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { StatCard } from '../components/dashboard/StatCard';
 import { QuickActions } from '../components/dashboard/QuickActions';
-import { getStats } from '../services/dashboardService'
+// importamos la funcion existente + las 2 nuevas del dashboardService
+import { getStats, getDeliveries, getMonthlyIncome } from '../services/dashboardService'
+
+// Importamos los componentes que creamos
+// DeliverySection: lista de entregas hoy/mañana
+// IncomeChart: gráfica de barras apiladas
+import DeliverySection from "../components/dashboard/DeliverySection"
+import IncomeChart from "../components/dashboard/IncomeChart"
 
 /*  
   Página principal del dashboard
@@ -21,6 +28,20 @@ export const DashboardPage = () => {
 
   // Estado de carga
   const [loading, setLoading] = useState(true);
+
+  // Estado para las entregas de hoy. Array vacío por defecto, se llena con RentalDetailDTO
+  const [todayDeliveries, setTodayDeliveries] = useState([])
+
+  // Estado para las entregas de mañana
+  const [tomorrowDeliveries, setTomorrowDeliveries] = useState([])
+
+  // Estado para los ingresos del mes (gráfica). Array de DailyIncomeDTO: { date, cobrado, anticipos, porCobrar }
+  const [incomeData, setIncomeData] = useState([])
+
+  // Loading separado para entregas y gráfica 
+  // Así cada sección puede cargar independientemente sin bloquear las demás.
+  const [loadingDeliveries, setLoadingDeliveries] = useState(true)
+  const [loadingIncome, setLoadingIncome] = useState(true)
 
   // Función para obtener estadísticas del backend
   const fetchStats = async () => {
@@ -41,9 +62,53 @@ export const DashboardPage = () => {
     }
   };
 
-  // Cargar estadísticas al montar el componente
+  // Función para cargar las entregas de hoy y mañana
+  // Hacemos 2 llamadas en paralelo con Promise.all:
+  //    - getDeliveries(0) -> entregas de hoy
+  //    - getDeliveries(1) -> entregas de mañana
+  // Promise.all ejecuta ambas al mismo tiempo, no espera a que termine una para empezar la otra.
+  // Esto es más rápido que hacer una después de la otra.
+  const fetchDeliveries = async () => {
+    setLoadingDeliveries(true)
+    try {
+      const [todayRes, tomorrowRes] = await Promise.all([
+        getDeliveries(0),
+        getDeliveries(1)
+      ])
+      setTodayDeliveries(todayRes.data || [])
+      setTomorrowDeliveries(tomorrowRes.data || [])
+    } catch (error) {
+      console.error("Error fetching deliveries: ", error)
+    } finally {
+      setLoadingDeliveries(false);
+    }
+  }
+
+  // Función para cargar los ingresos del mes
+  const fetchIncome = async () => {
+    setLoadingIncome(true)
+    try {
+      const response = await getMonthlyIncome();
+      setIncomeData(response.data || [])
+    } catch (error) {
+      console.error("Error fetching income: ", error)
+    } finally {
+      setLoadingIncome(false)
+    }
+  }
+
+  // Función que recarga TODOS los datos 
+  // Se ejecuta al montar el componente y al hacer clic en "Actualizar"
+  const fetchAllData = () => {
+    fetchStats()
+    fetchDeliveries()
+    fetchIncome()
+  }
+
+  // useEffect: se ejecuta una vez al montar el componente
+  // Ahora llama a fetchAllData() en vez de solo fetchStats()
   useEffect(() => {
-    fetchStats();
+    fetchAllData();
   }, []);
 
   // Formatear número como moneda MXN
@@ -68,12 +133,12 @@ export const DashboardPage = () => {
 
   return (
     <>
-      {/* Header con el titulo y botón actualizar */}
+      {/* Header con el titulo y botón actualizar, onClick ahora llama a fetchAllData para recargar todo, no solo las stats */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Dashboard</h2>
         <button
           className="btn btn-outline-secondary btn-sm"
-          onClick={fetchStats}
+          onClick={fetchAllData}
           disabled={loading}
         >
           <i className={`bi bi-arrow-clockwise ${loading ? 'spin' : ''}`}></i>
@@ -115,6 +180,31 @@ export const DashboardPage = () => {
           />
         </div>
       )}
+      {/* Sección inferior con 2 columnas
+        row: fila de Bootstrap
+        col-lg-6: cada columna ocupa la mitad en pantallas grandes
+        col-12: en pantallas chicas, cada una ocupa todo el ancho
+        Columna izquierda: DeliverySection (entregas)
+        Columna derecha: IncomeChart (gráfica) 
+        mt-4 margin-top para separar de las tarjetas
+        mb-4 margin-bottom para separar del final de la página*/}
+      <div className="row mt-4 mb-4">
+        {/* Columna izquierda: Entregas de hoy/mañana */}
+        <div className="col-12 col-lg-6 mb-3">
+          <DeliverySection
+            todayDeliveries={todayDeliveries}
+            tomorrowDeliveries={tomorrowDeliveries}
+            loading={loadingDeliveries}
+          />
+        </div>
+        {/* Columna derecha: Gráfica de ingresos */}
+        <div className="col-12 col-lg-6 mb-3">
+          <IncomeChart
+            incomeData={incomeData}
+            loading={loadingIncome}
+          />
+        </div>
+      </div>
     </>
   )
 };

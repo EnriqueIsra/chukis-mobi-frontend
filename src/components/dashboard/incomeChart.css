@@ -1,0 +1,15 @@
+/* Contenedor de la tarjeta de la gráfica
+    Mismo estilo que las demás tarjetas del dashboard */
+.income-chart-card {
+    border: none;
+    border-radius: 10px;
+}
+
+/* Contenedor de la gráfica
+    height: 300px define la altura fija de la gráfica
+    Esto funciona junto con maintainAspectRatio: false en las opciones de Chart.js
+    Sin esto, la gráfica se colapsa a 0px de alto porque Chart.js necesita que el contenedor
+    tenga una altura definida cuando maintanAspectRatio es false */
+.chart-container {
+    height: 300px;
+}

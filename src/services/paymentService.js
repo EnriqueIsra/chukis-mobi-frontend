@@ -32,6 +32,7 @@ export const createPayment = async (paymentData) => {
         return response
     } catch (error) {
         console.error("Error creating payment: ", error)
+        throw error
     }
 }
 
