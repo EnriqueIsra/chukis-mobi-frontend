@@ -61,3 +61,16 @@ export const updateRentalStatus = async (id, status) => {
     throw error;
   }
 };
+
+// Obtener una renta por su ID (con items, client, user completos)
+// Se usa para cargar los datos completos al abrir el modal de detalles
+// GET /api/rentals/{id}
+export const findById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/rentals/${id}`);
+    return response
+  } catch (error) {
+    console.error("Error fetching rental: ", error)
+    throw error;
+  }
+}

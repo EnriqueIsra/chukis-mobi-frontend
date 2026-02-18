@@ -53,3 +53,20 @@ export const getMonthlyIncome = async () => {
         throw error
     }
 }
+
+// =================
+// Obtiene todas las rentas pendientes de entregar (status CREATED) 
+// GET /api/dashboard/pending-rentals
+// Se usa en el dropdown expandible de la StatCard "Rentas por entregar"
+// Retorna un array donde cada elemento tiene:
+// { id, clientName, clientPhone, address, startDate, endDate, status, productSummary, total, totalPaid, pending }
+// =================
+export const getPendingRentals = async () => { 
+    try {
+        const response = await axiosInstance.get("/dashboard/pending-rentals")
+        return response
+    } catch (error) {
+        console.error("Error fetching pending rentals: ", error)
+        throw error
+    }
+}

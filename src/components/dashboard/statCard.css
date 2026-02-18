@@ -77,3 +77,51 @@
     from {transform: rotate(0deg); }
     to {transform: rotate(360deg);}
 }
+
+
+/* Modo expandible
+    Flecha chevron que indica quye la tarjeta se puede expandir */
+.stat-chevron {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+}
+
+/* Cuando está expandida. la flesa rota 180° (apunta hacia arriba) */
+.stat-chevron.rotated {
+    transform: rotate(180deg);
+}
+
+/* Columa de la tarjeta expandible - necesita position relative para que el panel expandible se posicione como overlay */
+.stat-card-col {
+    position: relative;
+}
+
+/* Panel que se despliega debajo de la tarjeta */
+.stat-card-expand {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    padding: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 4px 12px  rgba(0, 0, 0, 0.1);
+}
+
+/* Animación de deslizamiento hacia abajo */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
