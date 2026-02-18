@@ -1,0 +1,70 @@
+/* RentalDetailModal Styles
+    Modal reutilizable para detalles de renta
+*/
+
+/* Header con gradieante morado (mismo que las StatCards del dashboard) */
+.rental-detail-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: none;
+}
+
+/* Barra de botones de acción */
+/* Centrados, con espacio entre ellos, y si no caben bajan a otra línea */
+.rental-detail-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Cada botón de acción muestra icono + texto alineados horizontalmente */
+.rental-detail-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Sección de información - alineación a la izquierda */
+.rental-detail-info {
+    text-align: left;
+}
+
+/* Sección de pagos al fondo - fondo degradado suave */
+.rental-detail-payment {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid #dee2e6;
+}
+
+/* Etiqueta (TOTAL, PAGADO, POR COBRAR) */
+.rental-detail-payment .payment-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+/* Valor numérico ($500, $200, $300) */
+.rental-detail-payment .payment-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* Responsive - en pantallas chicas los botones van en columna */
+@media (max-width: 768px) {
+    .rental-detail-actions {
+        flex-direction: column;
+    }
+    .rental-detail-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .rental-detail-payment .payment-value {
+        font-size: 1rem;
+    }
+}

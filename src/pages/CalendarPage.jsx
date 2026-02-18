@@ -7,6 +7,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { findAll, remove, updateRentalStatus } from "../services/rentalService";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import "./CalendarPage.css";
+import RentalDetailModal from "../components/rentals/RentalDetailModal";
+import PaymentModal from "../components/payments/PaymentModal";
 
 // Colores según status
 const statusColors = {
@@ -45,6 +47,11 @@ export const CalendarPage = () => {
   const [loading, setLoading] = useState(true);
   const calendarRef = useRef(null);
 
+  // Renta seleccionada para el modal de detalles
+  const [selectedRental, setSelectedRental] = useState(null)
+  // Renta seleccionada para el modal de pagos
+  const [paymentRental, setPaymentRental] = useState(null)
+
   const loggedUser = JSON.parse(localStorage.getItem("user"));
   const userId = loggedUser?.id;
 
@@ -81,7 +88,7 @@ export const CalendarPage = () => {
   // Click en un evento
   const handleEventClick = (clickInfo) => {
     const rental = clickInfo.event.extendedProps.rental;
-    showRentalModal(rental);
+    setSelectedRental(rental);
   };
 
   // Click en espacio vacío (crear nueva renta)
@@ -142,131 +149,6 @@ export const CalendarPage = () => {
     });
   };
 
-  // Modal con detalles y acciones
-  const showRentalModal = (rental) => {
-    const colors = statusColors[rental.status] || statusColors.CREATED;
-    const statusLabel = statusLabels[rental.status] || "Desconocido";
-
-    const itemsHtml = rental.items
-      ?.map(
-        (item) =>
-          `<tr>
-            <td>${item.productName}</td>
-            <td class="text-center">${item.quantity}</td>
-            <td class="text-end">$${item.unitPrice}</td>
-            <td class="text-end">$${item.quantity * item.unitPrice}</td>
-          </tr>`
-      )
-      .join("") || "";
-
-    Swal.fire({
-      title: `<i class="bi bi-calendar-event me-2"></i>Renta #${rental.id}`,
-      html: `
-        <div class="rental-modal-content">
-          <!-- Acciones -->
-          <div class="rental-modal-actions mb-3">
-            <button id="btn-edit" class="btn btn-sm btn-outline-warning" title="Editar">
-              <i class="bi bi-pencil"></i> Editar
-            </button>
-            ${rental.status === 'CREATED' ? `
-              <button id="btn-status" class="btn btn-sm btn-outline-secondary" title="Cambiar estado">
-                <i class="bi bi-arrow-repeat"></i> Estado
-              </button>
-            ` : ''}
-            ${rental.status !== 'CANCELLED' ? `
-              <button id="btn-cancel" class="btn btn-sm btn-outline-danger" title="Cancelar renta">
-                <i class="bi bi-x-circle"></i> Cancelar
-              </button>
-            ` : ''}
-            <button id="btn-delete" class="btn btn-sm btn-danger" title="Eliminar">
-              <i class="bi bi-trash"></i> Eliminar
-            </button>
-          </div>
-
-          <!-- Status badge -->
-          <div class="text-center mb-3">
-            <span class="badge" style="background-color: ${colors.bg}; color: ${colors.text}; font-size: 0.9rem; padding: 8px 16px;">
-              ${statusLabel}
-            </span>
-          </div>
-
-          <!-- Información -->
-          <div class="text-start">
-            <div class="row mb-2">
-              <div class="col-4 text-muted">Cliente:</div>
-              <div class="col-8 fw-semibold">${rental.client?.name || "N/A"}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-4 text-muted">Teléfono:</div>
-              <div class="col-8">${rental.client?.phone || "N/A"}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-4 text-muted">Inicio:</div>
-              <div class="col-8"><i class="bi bi-calendar me-1 text-primary"></i>${formatDateTime(rental.startDate)}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-4 text-muted">Fin:</div>
-              <div class="col-8"><i class="bi bi-calendar-check me-1 text-success"></i>${formatDateTime(rental.endDate)}</div>
-            </div>
-            <div class="row mb-2">
-              <div class="col-4 text-muted">Dirección:</div>
-              <div class="col-8">${rental.address}</div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-4 text-muted">Creado por:</div>
-              <div class="col-8">${rental.user?.username || "N/A"}</div>
-            </div>
-
-            <hr />
-
-            <!-- Productos -->
-            <h6 class="mb-2"><i class="bi bi-box-seam me-1"></i>Productos</h6>
-            <table class="table table-sm table-bordered mb-3">
-              <thead class="table-light">
-                <tr>
-                  <th>Producto</th>
-                  <th class="text-center">Cant</th>
-                  <th class="text-end">Precio</th>
-                  <th class="text-end">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>${itemsHtml}</tbody>
-            </table>
-
-            <div class="text-end">
-              <span class="fs-5 fw-bold text-success">Total: $${rental.total}</span>
-            </div>
-          </div>
-        </div>
-      `,
-      width: 600,
-      showCloseButton: true,
-      showConfirmButton: false,
-      didOpen: () => {
-        // Eventos de los botones
-        document.getElementById("btn-edit")?.addEventListener("click", () => {
-          Swal.close();
-          handleEditRental(rental);
-        });
-
-        document.getElementById("btn-status")?.addEventListener("click", () => {
-          Swal.close();
-          handleChangeStatus(rental);
-        });
-
-        document.getElementById("btn-cancel")?.addEventListener("click", () => {
-          Swal.close();
-          handleCancelRental(rental);
-        });
-
-        document.getElementById("btn-delete")?.addEventListener("click", () => {
-          Swal.close();
-          handleDeleteRental(rental.id);
-        });
-      }
-    });
-  };
-
   // Handlers de acciones
   const handleEditRental = (rental) => {
     setRentalToEdit(rental);
@@ -278,12 +160,16 @@ export const CalendarPage = () => {
       title: "Cambiar estado de la renta",
       html: `
         <div class="d-flex flex-column gap-2">
-          <button id="btn-delivered" class="btn btn-warning">
-            <i class="bi bi-truck me-1"></i> Marcar como Entregada
-          </button>
-          <button id="btn-pickedup" class="btn btn-success">
-            <i class="bi bi-check-circle me-1"></i> Marcar como Recogida
-          </button>
+          ${rental.status === 'CREATED' ? `
+            <button id="btn-delivered" class="btn btn-warning">
+              <i class="bi bi-truck me-1"></i> Marcar como Entregada
+            </button>
+          ` : ''}
+          ${rental.status === 'DELIVERED' ? `
+            <button id="btn-pickedup" class="btn btn-success">
+              <i class="bi bi-check-circle me-1"></i> Marcar como Recogida
+            </button>
+          ` : ''}
         </div>
       `,
       showConfirmButton: false,
@@ -365,6 +251,11 @@ export const CalendarPage = () => {
   const handleSuccess = () => {
     getRentals();
   };
+
+  // Abrir modal de pagos
+  const handlePayment = (rental) => {
+    setPaymentRental(rental)
+  }
 
   return (
     <div className="calendar-page">
@@ -459,6 +350,28 @@ export const CalendarPage = () => {
           userId={userId}
           rentalToEdit={rentalToEdit}
           initialDate={selectedDate}
+        />
+      )}
+
+      {/* Modal de detalles de renta */}
+      {selectedRental && (
+        <RentalDetailModal
+          rental={selectedRental}
+          onClose={() => setSelectedRental(null)}
+          onEdit={handleEditRental}
+          onChangeStatus={handleChangeStatus}
+          onCancel={handleCancelRental}
+          onDelete={handleDeleteRental}
+          onPayment={handlePayment}
+        />
+      )}
+
+      {/* Modal de pagos */}
+      {paymentRental && (
+        <PaymentModal
+          rental={paymentRental}
+          onClose={() => setPaymentRental(null)}
+          onPaymentCreated={() => getRentals()}
         />
       )}
     </div>

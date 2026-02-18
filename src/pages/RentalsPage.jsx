@@ -6,19 +6,7 @@ import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
 import { findAll, remove, updateRentalStatus } from "../services/rentalService";
 import PaymentModal from "../components/payments/PaymentModal"  // Importamos el componente PaymentModal
-
-// Formatear fecha y hora: "2024-01-15T10:00:00" -> "15/01/2024 10:00"
-const formatDateTime = (dateTimeStr) => {
-  if (!dateTimeStr) return 'N/A';
-  const date = new Date(dateTimeStr);
-  return date.toLocaleString('es-MX', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-};
+import RentalDetailModal from "../components/rentals/RentalDetailModal";
 
 export const RentalsPage = () => {
   const [rentals, setRentals] = useState([]);
@@ -33,6 +21,10 @@ export const RentalsPage = () => {
   // - si tiene una renta: el modal está abierto mostrando esa renta. 
   // Usamos la renta completa no solo el id porque el modal necesita mostrar informacion como el total de la renta
   const [paymentRental, setPaymentRental] = useState(null);
+
+  // Renta seleccionada para el modal de detalles
+  // null = modal cerrado, objeto = modal abierto
+  const [selectedRental, setSelectedRental] = useState(null)
 
   // Obtener el usuario logueado del localStorage
   const loggedUser = JSON.parse(localStorage.getItem("user"));
@@ -70,32 +62,9 @@ export const RentalsPage = () => {
     setIsWizardOpen(true);
   };
 
+  // Ver detalles de una renta -> abre el RentalDetailModal
   const handlerViewRental = (rental) => {
-    const itemsHtml = rental.items?.map(item =>
-      `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>$${item.unitPrice}</td><td>$${item.quantity * item.unitPrice}</td></tr>`
-    ).join('') || '';
-
-    Swal.fire({
-      title: `Renta #${rental.id}`,
-      html: `
-        <div class="text-start">
-          <p><strong>Cliente:</strong> ${rental.client?.name || 'N/A'}</p>
-          <p><strong>Teléfono:</strong> ${rental.client?.phone || 'N/A'}</p>
-          <p><strong>Inicio:</strong> ${formatDateTime(rental.startDate)}</p>
-          <p><strong>Fin:</strong> ${formatDateTime(rental.endDate)}</p>
-          <p><strong>Dirección:</strong> ${rental.address}</p>
-          <p><strong>Creado por:</strong> ${rental.user?.username || 'N/A'}</p>
-          <hr/>
-          <table class="table table-sm">
-            <thead><tr><th>Producto</th><th>Cant</th><th>Precio</th><th>Subtotal</th></tr></thead>
-            <tbody>${itemsHtml}</tbody>
-          </table>
-          <p class="text-end fw-bold">Total: $${rental.total}</p>
-        </div>
-      `,
-      width: 600,
-      confirmButtonText: 'Cerrar'
-    });
+    setSelectedRental(rental)
   };
 
   const handlerDeleteRental = async (id) => {
@@ -123,17 +92,21 @@ export const RentalsPage = () => {
 
   const handlerChangeStatus = (rental) => {
     Swal.fire({
-      title: 'Declarar esta renta como:',
+      title: 'Cambiar status de la renta',
       html: `
       <div class="d-flex flex-column gap-2">
-        <button id="deliveredBtn" class="btn btn-warning">
-          <i class="bi bi-truck me-1"></i> Entregada
-        </button>
-        <button id="pickedUpBtn" class="btn btn-success">
-          <i class="bi bi-check-circle me-1"></i> Recogida
-        </button>
-      </div>
-    `,
+        ${rental.status === 'CREATED' ? `
+          <button id="deliveredBtn" class="btn btn-warning">
+            <i class="bi bi-truck me-1"></i> Marcar como Entregada
+          </button>  
+        ` : ''}
+        ${rental.status === 'DELIVERED' ? `
+          <button id="pickedUpBtn" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i> Marcar como Recogida
+          </button>  
+        ` : ''}
+        </div>
+      `,
       showConfirmButton: false,
       showCancelButton: true,
       cancelButtonText: 'Cerrar',
@@ -199,7 +172,7 @@ export const RentalsPage = () => {
   // es falsa cuando paymentRental es null
   const handlerClosePayment = () => {
     setPaymentRental(null)
-  } 
+  }
 
   // Callback cuando se crea un pago exitosamente
   // Este callback se ejecuta desde PaymentModal después de registrar un pago. 
@@ -295,6 +268,19 @@ export const RentalsPage = () => {
           rental={paymentRental}
           onClose={handlerClosePayment}
           onPaymentCreated={handlerPaymentCreated}
+        />
+      )}
+
+      {/* Modal de detalles de renta */}
+      {selectedRental && (
+        <RentalDetailModal
+          rental={selectedRental}
+          onClose={() => setSelectedRental(null)}
+          onEdit={handlerEditRental}
+          onChangeStatus={handlerChangeStatus}
+          onCancel={handlerCancelRental}
+          onDelete={handlerDeleteRental}
+          onPayment={handlerOpenPayment}
         />
       )}
     </>
