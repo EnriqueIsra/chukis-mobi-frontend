@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { StatCard } from '../components/dashboard/StatCard';
 import { QuickActions } from '../components/dashboard/QuickActions';
 // Importamos la funcion existente + las 2 nuevas del dashboardService
-import { getStats, getDeliveries, getMonthlyIncome, getPendingRentals } from '../services/dashboardService'
+import { getStats, getDeliveries, getMonthlyIncome, getPendingRentals, getDeliveredRentals } from '../services/dashboardService'
 // Importamos funciones del rentalService para las acciones del modal
 import { findById, remove, updateRentalStatus } from "../services/rentalService";
 
@@ -24,7 +23,6 @@ import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
   Muestra estadísticas y acciones rápidas
 */
 export const DashboardPage = () => {
-  const navigate = useNavigate();
 
   // Obtenemos el usuario logueado para pasarlo al RentalWizard
   const loggedUser = JSON.parse(localStorage.getItem("user"))
@@ -54,9 +52,13 @@ export const DashboardPage = () => {
   const [loadingDeliveries, setLoadingDeliveries] = useState(true)
   const [loadingIncome, setLoadingIncome] = useState(true)
 
-  // Lista de renas pendientes (RentalDetailDTO) para el dropdown de la StatCard
+  // Lista de rentas por entregar (RentalDetailDTO) para el dropdown de la StatCard Rentas Por Entregar
   const [pendingRentals, setPendingRentals] = useState([])
   const [loadingPending, setLoadingPending] = useState(false)
+
+  // Lista de rentas por recoger (RentalDetailDTO) para el dropdown de la StatCard Rentas Por Recoger
+  const [deliveredRentals, setDeliveredRentals] = useState([])
+  const [loadingDelivered, setLoadingDelivered] = useState(false)
 
   // Renta seleccionada para el modal de detalles (RentalResponse completo con items)
   // null = modal cerrado, objeto = modal abierto
@@ -137,6 +139,19 @@ export const DashboardPage = () => {
     }
   }
 
+  // Función que carga las rentas por recoger (status DELIVERED)
+  const fetchDeliveredRentals = async () => {
+    setLoadingDelivered(true)
+    try {
+      const response = await getDeliveredRentals()
+      setDeliveredRentals(response.data || [])
+    } catch (error) {
+      console.error("Error fetching delivered rentals: ", error)
+    } finally {
+      setLoadingDelivered(false)
+    }
+  }
+
   // Función que recarga TODOS los datos 
   // Se ejecuta al montar el componente y al hacer clic en "Actualizar"
   const fetchAllData = () => {
@@ -144,6 +159,7 @@ export const DashboardPage = () => {
     fetchDeliveries()
     fetchIncome()
     fetchPendingRentals()
+    fetchDeliveredRentals()
   }
 
   // useEffect: se ejecuta una vez al montar el componente
@@ -295,11 +311,6 @@ export const DashboardPage = () => {
     return new Date().toLocaleDateString('es-MX', { month: 'long' });
   }
 
-  // Navegar a rentas al hacer clic en una tarjeta
-  const handleStatClick = () => {
-    navigate('/rentals')
-  };
-
   return (
     <>
       {/* Header con el titulo y botón actualizar, onClick ahora llama a fetchAllData para recargar todo, no solo las stats */}
@@ -345,10 +356,10 @@ export const DashboardPage = () => {
             ) : pendingRentals.length === 0 ? (
               <div className="text-center text-muted py-3">
                 <i className="bi bi-check-circle display-6 d-block mb-2"></i>
-                <p className="mb-0">No hay rentas pendientes</p>
+                <p className="mb-0">No hay rentas pendientes de entregar</p>
               </div>
             ) : (
-              /* Lista de rentas pendientes - misma estructura visual que DeliverySection */
+              /* Lista de rentas pendientes de entregar - misma estructura visual que DeliverySection */
               pendingRentals.map((rental) => (
                 <div
                   key={rental.id}
@@ -404,8 +415,71 @@ export const DashboardPage = () => {
             value={stats.rentasPorRecoger}
             icon={"bi-truck"}
             color="warning"
-            onClick={handleStatClick}
-          />
+            expandible
+          >
+            {/* Contenido del panel expandible (children de StatCard) */}
+            {/* Se muestra cuando el usuario hace clic en la tarjeta */}
+            {loadingDelivered ? (
+              <div className="text-center py-3">
+                <div className="spinner-border spinner-border-sm text-warning"></div>
+              </div>
+            ) : deliveredRentals.length === 0 ? (
+              <div className="text-center text-muted py-3">
+                <i className="bi bi-check-circle display-6 d-block mb-2"></i>
+                <p className="mb-0">No hay rentas pendientes de recoger</p>
+              </div>
+            ) : (
+              /* Lista de rentas pendientes de recoger - misma estructura visual que DeliverySection */
+              deliveredRentals.map((rental) => (
+                <div
+                  key={rental.id}
+                  className="delivery-item"
+                  style={{ cursor: 'pointer' }}
+                  onClick={(e) => { e.stopPropagation(); handleRentalClick(rental.id) }}
+                >
+                  {/* Fila superior: cliente + hora */}
+                  <div className="d-flex justify-content-between align-items-start mb-1">
+                    <div>
+                      <span className="fw-semibold">
+                        <i className="bi bi-person-fill text-warning me-1"></i>
+                        {rental.clientName}
+                      </span>
+                      <small className="text-muted ms-2">
+                        <i className="bi bi-telephone me-1"></i>
+                        {rental.clientPhone}
+                      </small>
+                    </div>
+                    <span className="badge bg-warning text-dark">
+                      <i className="bi bi-clock me-1"></i>
+                      {formatTime(rental.endDate)}
+                    </span>
+                  </div>
+                  {/* Dirección */}
+                  <div className="mb-1">
+                    <small className="text-muted">
+                      <i className="bi bi-geo-alt me-1"></i>
+                      {rental.address}
+                    </small>
+                  </div>
+                  {/* Resumen de productos */}
+                  <div className="mb-2">
+                    <small className="text-secondary">
+                      <i className="bi bi-box-seam me-1"></i>
+                      {rental.productSummary}
+                    </small>
+                  </div>
+                  {/* Total / Pagado / Pendiente */}
+                  <div className="delivery-payment">
+                    <div className="d-flex justify-content-between mb-1">
+                      <small>Total: <strong>{formatCurrency(rental.total)}</strong></small>
+                      <small>Pagado: <strong className="text-success">{formatCurrency(rental.totalPaid)}</strong></small>
+                      <small>Pendiente: <strong className="text-danger">{formatCurrency(rental.pending)}</strong></small>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </StatCard>
           <StatCard
             title={`Ingresos de ${getCurrentMonthName()}`}
             value={formatCurrency(stats.ingresosDelMes)}

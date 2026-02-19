@@ -70,3 +70,14 @@ export const getPendingRentals = async () => {
         throw error
     }
 }
+
+// Obtiene las rentas por recoger (status DELIVERED)
+export const getDeliveredRentals = async () => {
+    try {
+        const response = await axiosInstance.get("/dashboard/delivered-rentals")
+        return response
+    } catch (error) {
+        console.error("Error fetching delivered rentals: ", error)
+        throw error
+    }
+}
