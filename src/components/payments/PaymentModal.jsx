@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPayment, getPaymentsByRentalId } from "../../services/paymentService";
 import Swal from "sweetalert2";
-import "./paymentModal.css"; 
+import "./paymentModal.css";
 
 /* 
     Modal para registrar pagos/anticipos de una renta
@@ -19,6 +19,9 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
     // Estado para historial de pagos
     const [payments, setPayments] = useState([])
     const [loadingPayments, setLoadingPayments] = useState(true)
+
+    // Bandera para mostrar advertencia cuando el usuario ingresa más del máximo
+    const [showAmountWarning, setShowAmountWarning] = useState(false)
 
     // Calcular totales
     const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0)
@@ -42,6 +45,23 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
         }
     }
 
+    // Validar monto en tiempo real 
+    // Si el usuario ingresa más del pendiente:
+    // 1.- Auto-corregir el valor al máximo (pending)
+    // 2.- Muestra texto rojo de advertencia
+    // 3.- Oculta la advertencia después de 3 segundos.
+    const handleAmountChange = (e) => {
+        const value = Number(e.target.value)
+        if (value > pending) {
+            setAmount(pending.toString())
+            setShowAmountWarning(true)
+            setTimeout(() => setShowAmountWarning(false), 3000)
+        } else {
+            setAmount(e.target.value)
+            setShowAmountWarning(false)
+        }
+    }
+
     // Manejar envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -53,15 +73,6 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
             return
         }
 
-        // Validar que no exceda el pendiente
-        if (amountNum > pending) {
-            Swal.fire(
-                "Error",
-                `El monto no puede ser mayor a la cantidad pendiente ($${pending.toLocaleString()})`,
-                "error"
-            )
-            return
-        }
         setLoading(true)
         try {
             // Crear el pago
@@ -80,7 +91,14 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
                 showConfirmButton: false
             })
 
-            // Limpiar formulario y recargar pagos
+            // Limpiar formulario
+            setAmount("")
+            setNotes("")
+
+            // Recargar historial para que el nuevo pago aparezca de inmediato
+            await loadPayments()
+
+            // Notificar al padre para que recargue sus datos (stats, etc.)
             if (onPaymentCreated) {
                 onPaymentCreated()
             }
@@ -177,11 +195,11 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
                                                 <label className="form-label">Monto *</label>
                                                 <div className="input-group">
                                                     <span className="input-group-text">$</span>
-                                                    <input 
+                                                    <input
                                                         type="number"
                                                         className="form-control"
                                                         value={amount}
-                                                        onChange={(e) => setAmount(e.target.value)}
+                                                        onChange={handleAmountChange}
                                                         placeholder="0"
                                                         min="1"
                                                         max={pending}
@@ -191,12 +209,18 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
                                                 <small className="text-muted">
                                                     Máximo: ${pending.toLocaleString()}
                                                 </small>
+                                                {showAmountWarning && (
+                                                    <small className="text-danger d-block mt-1">
+                                                        <i className="bi bi-exclamation-triangle me-1"></i>
+                                                        No puedes ingresar más de ${pending.toLocaleString()}
+                                                    </small>
+                                                )}
                                             </div>
 
                                             {/* Notas */}
                                             <div className="mb-3">
                                                 <label className="form-label">Notas (opcional)</label>
-                                                <input 
+                                                <input
                                                     type="text"
                                                     className="form-control"
                                                     value={notes}
@@ -207,7 +231,7 @@ const PaymentModal = ({ rental, onClose, onPaymentCreated }) => {
                                             </div>
 
                                             {/* Botón */}
-                                            <button 
+                                            <button
                                                 type="submit"
                                                 className="btn btn-success w-100"
                                                 disabled={loading}

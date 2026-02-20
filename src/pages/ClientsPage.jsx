@@ -16,7 +16,7 @@ export const ClientsPage = () => {
         direccion: '',
         email: ''
     })
-    const [viewMode, setViewMode] = useState("table");
+    const [viewMode, setViewMode] = useState("cards");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getClients = async () => {

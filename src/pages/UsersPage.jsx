@@ -16,7 +16,7 @@ export const UsersPage = () => {
         password: '',
         imageUrl: '',
     })
-    const [viewMode, setViewMode] = useState("table");
+    const [viewMode, setViewMode] = useState("cards");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getUsers = async () => {
