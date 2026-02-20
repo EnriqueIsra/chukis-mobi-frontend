@@ -105,7 +105,7 @@ const RentalTable = ({
                   >
                     <i className="bi bi-eye"></i>
                   </button>
-                  {rental.status === 'CREATED' && (
+                  {rental.status === 'CREATED' || rental.status === 'DELIVERED' && (
                     <button
                       className="btn btn-sm btn-outline-secondary"
                       onClick={() => onChangeStatus(rental)}

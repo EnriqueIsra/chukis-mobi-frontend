@@ -18,7 +18,7 @@ export const ProductsPage = () => {
         stock: '',
         imageUrl: ''
     })
-    const [viewMode, setViewMode] = useState("table");
+    const [viewMode, setViewMode] = useState("cards");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const getProducts = async () => {

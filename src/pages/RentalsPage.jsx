@@ -10,7 +10,7 @@ import RentalDetailModal from "../components/rentals/RentalDetailModal";
 
 export const RentalsPage = () => {
   const [rentals, setRentals] = useState([]);
-  const [viewMode, setViewMode] = useState("table");
+  const [viewMode, setViewMode] = useState("cards");
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [rentalToEdit, setRentalToEdit] = useState(null);
   const [loading, setLoading] = useState(true);
