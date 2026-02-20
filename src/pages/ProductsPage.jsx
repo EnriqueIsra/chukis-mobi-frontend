@@ -9,6 +9,9 @@ import { findAll, create, update, remove } from "../services/productService";
 export const ProductsPage = () => {
 
     const [products, setProducts] = useState([])
+
+    // Guarda el texto que el usuario escribe en el buscador
+    const [searchTerm, setSearchTerm] = useState("")
     const [productSelected, setProductSelected] = useState({
         id: 0,
         name: '',
@@ -23,13 +26,38 @@ export const ProductsPage = () => {
 
     const getProducts = async () => {
         const result = await findAll()
-        setProducts(result.data)
-    }
+        const data = result?.data;
+
+        if (Array.isArray(data)) {
+            setProducts(data);
+        } else if (Array.isArray(data?.content)) {
+            setProducts(data.content);
+        } else {
+            setProducts([]);
+            console.error("Formato inesperado de productos:", data);
+        }
+    };
+
 
     useEffect(() => {
         getProducts()
     }, [])
-    
+
+    // Filtrado de productos (frontend) se filtra por: Nombre, Descripción y Precio
+    // Este arreglo será usado tanto por la tabla como por las cards
+    const filteredProducts = Array.isArray(products)
+        ? products.filter(product => {
+            const search = searchTerm.toLowerCase();
+
+            return (
+                product.name?.toLowerCase().includes(search) ||
+                product.description?.toLowerCase().includes(search) ||
+                String(product.price).includes(search)
+            );
+        })
+        : [];
+
+
     const handlerAddProduct = async (product) => {
         console.log('handlerAddProduct received:', product);
         if (product.id > 0) {
@@ -129,14 +157,19 @@ export const ProductsPage = () => {
                 </button>
             </div>
 
-            <ProductsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+            <ProductsToolbar
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                searchTerm={searchTerm}
+                setSearchTerm={setSearchTerm}
+            />
 
             {viewMode === "table" ? (
                 <div className="row">
                     <div className="col-12">
                         {products.length > 0 ? (
                             <ProductTable
-                                products={products}
+                                products={filteredProducts}
                                 handlerProductSelected={handlerProductSelected}
                                 handlerRemoveProduct={handlerRemoveProduct}
                             />
@@ -150,7 +183,7 @@ export const ProductsPage = () => {
             ) : (
                 <div className="row">
                     {products.length > 0 ? (
-                        products.map(product => (
+                        filteredProducts.map(product => (
                             <ProductCard
                                 key={product.id}
                                 product={product}
