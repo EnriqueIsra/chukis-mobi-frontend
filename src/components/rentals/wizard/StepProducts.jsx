@@ -2,12 +2,19 @@ import { useEffect, useState } from "react";
 import { getAvailability } from "../../../services/productService";
 import ProductSelectorRow from "./ProductSelectRow";
 
+// Buscador reutilizable
+import { SearchInput } from "../../common/SearchInput";
+import { useProductFilter } from "../../../hooks/useProductFilter";
+
+
 const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
   const [products, setProducts] = useState([]);
   const [items, setItems] = useState(rentalData.items || []);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // texto del buscador 
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     if (rentalData.startDate && rentalData.endDate) {
       setLoading(true);
@@ -20,6 +27,10 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
         .finally(() => setLoading(false));
     }
   }, [rentalData.startDate, rentalData.endDate]);
+
+  // productos filtrados 
+  /* Reusa exactamente la misma lógica que ProductsPage */
+  const filteredProducts = useProductFilter(products, searchTerm);
 
   const addOrUpdateItem = (product, quantity) => {
     if (quantity <= 0) {
@@ -68,6 +79,19 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
+      {/* ============================= */}
+      {/* 🔹 NUEVO: Buscador */}
+      {!loading && (
+        <div className="mb-3">
+          <SearchInput
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Buscar producto por nombre, descripción o precio"
+          />
+        </div>
+      )}
+      {/* ============================= */}
+
       {loading ? (
         <div className="text-center py-4">
           <div className="spinner-border text-primary" role="status">
@@ -75,6 +99,13 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
           </div>
           <p className="mt-2 text-muted">Verificando disponibilidad...</p>
         </div>
+      ) : filteredProducts.length === 0 ? (
+        /* ============================= */
+        /* NUEVO: feedback cuando no hay resultados */
+        <div className="alert alert-warning">
+          No se encontraron productos con ese criterio
+        </div>
+        /* ============================= */
       ) : (
         <table className="table table-sm align-middle">
           <thead>
@@ -86,7 +117,9 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {/* ============================= */}
+            {/* CAMBIO: usar filteredProducts */}
+            {filteredProducts.map((product) => (
               <ProductSelectorRow
                 key={product.id}
                 product={product}
@@ -96,6 +129,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
                 onChange={addOrUpdateItem}
               />
             ))}
+            {/* ============================= */}
           </tbody>
         </table>
       )}
