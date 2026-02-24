@@ -52,6 +52,7 @@ export const ProductsPage = () => {
             return (
                 product.name?.toLowerCase().includes(search) ||
                 product.description?.toLowerCase().includes(search) ||
+                product.color?.toLowerCase().includes(search) || 
                 String(product.price).includes(search)
             );
         })
@@ -147,22 +148,43 @@ export const ProductsPage = () => {
 
     return (
         <>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="mb-0">Productos</h2>
-                <button
-                    className="btn btn-primary"
-                    onClick={handlerOpenModal}
-                >
-                    <i className="bi bi-plus-lg"></i> Agregar Producto
-                </button>
+            <div className="row align-items-center g-2 mb-3">
+
+                {/* Columna 1: Título */}
+                <div className="col-12 col-lg-auto d-flex justify-content-center justify-content-lg-start">
+                    <h2 className="mb-0">Productos</h2>
+                </div>
+                {/* Columna 2: Botón agregar */}
+                <div className="col-12 col-lg-auto">
+                    <button
+                        className="btn btn-primary w-100"
+                        onClick={handlerOpenModal}
+                    >
+                        <i className="bi bi-plus-lg"></i> Agregar Producto
+                    </button>
+                </div>
+
+                {/* Columna 3: Buscador */}
+                <div className="col-12 col-lg">
+                    {/* 🔍 BUSCADOR */}
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nombre, descripción, precio o color..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                {/* Columna 4: Botones de vista */}
+                <div className="col-12 col-lg-auto">
+                    <ProductsToolbar
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                    />
+                </div>
             </div>
 
-            <ProductsToolbar
-                viewMode={viewMode}
-                setViewMode={setViewMode}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-            />
+
 
             {viewMode === "table" ? (
                 <div className="row">

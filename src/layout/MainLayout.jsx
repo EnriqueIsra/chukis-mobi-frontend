@@ -12,7 +12,7 @@ export const MainLayout = ({ user, onLogout }) => {
                 collapsed={collapsed}
                 onToggle={() => setCollapsed(!collapsed)}
             />
-            <main className="flex-grow-1 p-4">
+            <main className="flex-grow-1 p-4 overflow-hidden">
                 <Outlet />
             </main>
         </div>
