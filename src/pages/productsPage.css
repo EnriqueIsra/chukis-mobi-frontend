@@ -25,7 +25,7 @@
     overflow: hidden;
 }
 
-/* 
+/*
     PASO 3: Overlay RGB animado
     ----------------------------------
     ::after crea un "elemento fantasma" hijo de .products-header
@@ -83,4 +83,39 @@
 @keyframes rgb-slide {
     0% { background-position: 0% 50%; }
     100% { background-position: 200% 50%; }
+}
+
+/* 
+    PASO 4: Desvanecido en bordes (sombra interna)
+    ----------------------------------
+    ::before crea otro pseudo-elemento, esta vez lo usamos para oscurecer los bordes internos del header con una sombra tipo "viñeta".
+    ----------------------------------
+    content: ""         -> Obligatorio
+    position: absolute  -> Se posiciona dentro del header
+    inset: 0            -> cubre todo el header (igual que ::after)
+    ----------------------------------
+    box-shadow: inset ...
+        -> "inset" significa que la sombra va HACIA ADENTRO (no hacia afuera)
+        -> Ponemos 4 sombras internas, una por cada lado:
+            inset 0 0 40px 10px rgba(0,0,0,0.7)     -> sombra general en todos los bordes
+            inset 0 30px 30px -10px rgba(0,0,0,0.5)     -> refuerzo en el borde SUPERIOR
+            inset 0 -30px 30px -10px rgba(0,0,0,0.7)     -> refuerzo en el borde INFERIOR
+            inset 30px 0 30px -10px rgba(0,0,0,0.7)     -> refuerzo en el borde DERECHO
+        -> rgba(0,0,0,0.7) = negro al 70% de opacidad
+        -> Los valores (desplazamiento-X, desplazamiento-Y, difuminado, expansión) controlan la posición y tamaño de cada sombra
+    ----------------------------------
+    pointer-events: none    -> no bloquea clics (igual que ::after)
+    z-index: 1              -> se pone ENCIMA del ::after (que tiene z-index auto/0) para que el desvanecido se vea sobre los colores RGB
+*/
+.products-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: 
+        inset 0 0 40px 10px rgba(0, 0, 0, 0.7),
+        inset 0 30px 30px -10px rgba(0, 0, 0, 0.5),
+        inset 0 -30px 30px -10px rgba(0, 0, 0, 0.5),
+        inset 30px 0 30px -10px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    z-index: 1;
 }
