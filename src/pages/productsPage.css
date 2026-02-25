@@ -1,0 +1,86 @@
+/* Aquí irán los estilos del header de productos */
+/* 
+    PASO 2: Fondo oscuro con degradado
+    ----------------------------------
+    linear-gradient(135deg...) -> degradado diagonal (de esquina superior-izquierda a esquina inferior-derecha que mezcla 4 tonos oscuros:
+    #0f0f0f -> negro casi puro (esquina superior-izquierda)
+    #1a1a2e -> negro con tinte azul/púrpura
+    #16213e -> azul marino profundo
+    #0f3460 -> azul oscuro intenso (esquina inferior-derecha)
+    ----------------------------------
+    border-radius: 16px -> esquinas redondeadas para aspecto de "tarjeta"
+    padding: 1.5rem -> espacio interno para que el contenido no toque los bordes
+    margin-bottom: 1.5rem -> separa el header del contenido de abajo
+    ----------------------------------
+    position: relative -> necesario para que los pseudo-elementos (::before, ::after) que agregaremos después se posiciones DENTRO de este contenedor
+    ----------------------------------
+    overflow: hidden -> recorta cualquier efecto visual que se salga de los bordes redondeados (importante para las animaciones RGB del paso 3)
+*/
+.products-header {
+    background: linear-gradient(135deg, #0f0f0f, #1a1a2e, #16213e, #0f3460);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 
+    PASO 3: Overlay RGB animado
+    ----------------------------------
+    ::after crea un "elemento fantasma" hijo de .products-header
+    Lo usamos como una capa transparente con un degradado de colores RGB que se desliza continuamente de izquierda a derecha
+    ----------------------------------
+    content:""          -> Obligatorio para que el pseudo-elemento exista (aunque esté vacío)
+    position: absolute  -> Se posiciona respecto al padre (.products-header que tiene position: relative)
+    inset: 0            -> Atajo para top:0, right: 0, bottom: 0, left: 0       -> cubre TODO el header
+    ----------------------------------
+    background: linear-gradient(90deg, ...)
+        -> degradado HORIZONTAL que pasa por colores tipo RGB:
+        -> cyan (#00fff0) -> azul (#0040ff) -> púrpura (#8000ff) -> rosa (#ff00c8) -> rojo (#ff0040) -> cyan
+        -> Se repite el cyan al final para que el loop sea continuo (sin "salto")
+    ----------------------------------
+    background-size: 200% 100%
+        -> El degradado es el DOBLE de ancho que el contenedor
+        -> Esto permite que al mover el background-position se vea el efecto de deslizamiento
+    ----------------------------------
+    animation: rgb-slide 6s linear infinite
+        -> Aplica la animación "rgb-slide" que definimos abajo:
+        -> 6s = duración de un ciclo completo
+        -> linear = velocidad constante (sin aceleración)
+        -> infinite = se repite para siempre
+    ----------------------------------
+    opacity: 0.25 
+        -> Solo se ve al 25% -> los colores se ven suaves, no agresivos
+        -> Sin esto se vería como un arcoíris encima y taparía todo el fondo oscuro
+    ----------------------------------
+    pointer-events: none
+        -> Esta capa es solo visual, no debe interceptar clics
+        Sin esto, el overlay bloquearía los botones e inputs de abajo
+*/
+.products-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        #00fff0, #0040ff, #8000ff, #ff00c8, #ff0040, #00fff0);
+    background-size: 200% 100%;
+    animation: rgb-slide 6s linear infinite;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+/* 
+    @Keyframes rgb-slide
+    -> Define la animación que mueve el degradado horizontalmente
+    ----------------------------------
+    En 0%       -> background-position: 0% -> el degradado empieza en su posición normal
+    En 100%     -> background-position: 200% -> Se ha desplazado completamente a la derecha
+    ----------------------------------
+    Como el degradado mide 200% del ancho (background-size: 200% 100%),
+    al llegar a 200% vuelve al inicio sin "salto" visible -> loop infinito suave
+*/
+@keyframes rgb-slide {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}

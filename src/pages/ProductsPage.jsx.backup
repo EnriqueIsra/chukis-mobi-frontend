@@ -149,51 +149,35 @@ export const ProductsPage = () => {
 
     return (
         <>
-            {/* HEADER DEL MÓDULO */}
-            {/* 
-                products-header -> contenedor con fondo oscuro y efectos
-                Adentro tiene 2 secciones:
-                1.- El título + línea decorativa
-                2.- Los controles en un row responsivo de Bootstrap
-            */}
             <div className="products-header">
-                {/* Título con clase para estilos de glow/neón */}
+                {/* Título + línea decorativa */}
                 <h2 className="products-title">Productos</h2>
-
-                {/* Línea decorativa que separa título de controles */}
                 <hr className="products-title-divider" />
 
-                {/* 
-                    Controles de row de Bootstrap:
-                    - g-2 -> gap de 0.5rem entre columnas
-                    - align-items-center -> centra verticalmente
-                    - Cada col-12 -> ocupa todo el ancho en pantalla chica (se apilan)
-                    - Cada col-lg-auto o col-lg -> en pantalla grande se ponen en fila
-                */}
+                {/* Controles */}
                 <div className="row align-items-center g-2">
-                    
-                    {/* col-lg-auto -> toma solo el ancho del botón en pantalla grande */}
+                    {/* Botón agregar */}
                     <div className="col-12 col-lg-auto">
                         <button
                             className="btn btn-primary w-100"
                             onClick={handlerOpenModal}
                         >
-                            <i className="bi bi-plus-lg"></i> Agregar Nuevo Producto
+                            <i className="bi bi-plus-lg"></i> Agregar Producto
                         </button>
                     </div>
 
-                    {/* col-lg (sin número) -> toma TODO el espacio restante en pantalla grande */}
+                    {/* Buscador */}
                     <div className="col-12 col-lg">
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Busca por nombre, descripción, precio o color"
+                            placeholder="Buscar por nombre, descripción, precio o color..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
-                    {/* col-lg-auto -> toma solo el ancho de los botones en pantalla grande */}
+                    {/* Botones de vista */}
                     <div className="col-12 col-lg-auto">
                         <ProductsToolbar
                             viewMode={viewMode}
@@ -202,8 +186,6 @@ export const ProductsPage = () => {
                     </div>
                 </div>
             </div>
-            {/* ====== FIN HEADER ====== */}
-
             {viewMode === "table" ? (
                 <div className="row">
                     <div className="col-12">

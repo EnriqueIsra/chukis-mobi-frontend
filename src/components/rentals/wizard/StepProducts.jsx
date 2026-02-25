@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { getAvailability } from "../../../services/productService";
-import ProductSelectorRow from "./ProductSelectRow";
 
 // Buscador reutilizable
 import { SearchInput } from "../../common/SearchInput";
 import { useProductFilter } from "../../../hooks/useProductFilter";
+import ProductSelectorCard from "./ProductSelectorCard";
 
 
 const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
@@ -86,7 +86,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
           <SearchInput
             value={searchTerm}
             onChange={setSearchTerm}
-            placeholder="Buscar producto por nombre, descripción o precio"
+            placeholder="Buscar producto por nombre, descripción, precio o color"
           />
         </div>
       )}
@@ -107,20 +107,11 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
         </div>
         /* ============================= */
       ) : (
-        <table className="table table-sm align-middle">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Disponible</th>
-              <th width="100">Cantidad</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div className="row">
             {/* ============================= */}
             {/* CAMBIO: usar filteredProducts */}
             {filteredProducts.map((product) => (
-              <ProductSelectorRow
+              <ProductSelectorCard
                 key={product.id}
                 product={product}
                 selectedItem={items.find(
@@ -130,8 +121,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
               />
             ))}
             {/* ============================= */}
-          </tbody>
-        </table>
+        </div>
       )}
 
       <div className="d-flex justify-content-between mt-4">

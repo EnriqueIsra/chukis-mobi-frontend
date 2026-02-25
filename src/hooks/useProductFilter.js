@@ -14,6 +14,7 @@ export const useProductFilter = (products = [], searchTerm = "") => {
     return products.filter(product =>
       product.name?.toLowerCase().includes(search) ||
       product.description?.toLowerCase().includes(search) ||
+      product.color?.toLowerCase().includes(search) ||
       String(product.price).includes(search)
     );
   }, [products, searchTerm]);
