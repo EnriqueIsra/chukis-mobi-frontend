@@ -187,7 +187,7 @@ export const ProductsPage = () => {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Busca por nombre, descripción, precio o color"
+                            placeholder="Buscar por nombre, descripción, precio o color..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

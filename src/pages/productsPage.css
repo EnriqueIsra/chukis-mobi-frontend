@@ -1,20 +1,21 @@
 /* Aquí irán los estilos del header de productos */
+
 /* 
-    PASO 2: Fondo oscuro con degradado
+    Fondo oscuro con degradado
     ----------------------------------
-    linear-gradient(135deg...) -> degradado diagonal (de esquina superior-izquierda a esquina inferior-derecha que mezcla 4 tonos oscuros:
-    #0f0f0f -> negro casi puro (esquina superior-izquierda)
-    #1a1a2e -> negro con tinte azul/púrpura
-    #16213e -> azul marino profundo
-    #0f3460 -> azul oscuro intenso (esquina inferior-derecha)
+    linear-gradient(135deg...) -> degradado diagonal que mezcla 4 tonos oscuros:
+        #0f0f0f -> negro casi puro (esquina superior-izquierda)
+        #1a1a2e -> negro con tinte azul/púrpura
+        #16213e -> azul marino profundo
+        #0f3460 -> azul oscuro intenso (esquina inferior-derecha)
     ----------------------------------
     border-radius: 16px -> esquinas redondeadas para aspecto de "tarjeta"
     padding: 1.5rem -> espacio interno para que el contenido no toque los bordes
     margin-bottom: 1.5rem -> separa el header del contenido de abajo
     ----------------------------------
-    position: relative -> necesario para que los pseudo-elementos (::before, ::after) que agregaremos después se posiciones DENTRO de este contenedor
+    position: relative -> necesario para que los pseudo-elementos (::before, ::after) se posicionen DENTRO de este contenedor
     ----------------------------------
-    overflow: hidden -> recorta cualquier efecto visual que se salga de los bordes redondeados (importante para las animaciones RGB del paso 3)
+    overflow: hidden -> recorta cualquier efecto visual que se salga de los bordes redondeados (importante para las animaciones RGB)
 */
 .products-header {
     background: linear-gradient(135deg, #0f0f0f, #1a1a2e, #16213e, #0f3460);
@@ -25,277 +26,260 @@
     overflow: hidden;
 }
 
-/*
-    PASO 3: Overlay RGB animado
+/* 
+    Overlay RGB animado
     ----------------------------------
-    ::after crea un "elemento fantasma" hijo de .products-header
-    Lo usamos como una capa transparente con un degradado de colores RGB que se desliza continuamente de izquierda a derecha
+    ::after crea un "elemento fantasma" hijo de .products-header.
+    Es una capa transparente con un degradado de colores RGB que se desliza de izquierda a derecha continuamente.
     ----------------------------------
-    content:""          -> Obligatorio para que el pseudo-elemento exista (aunque esté vacío)
-    position: absolute  -> Se posiciona respecto al padre (.products-header que tiene position: relative)
-    inset: 0            -> Atajo para top:0, right: 0, bottom: 0, left: 0       -> cubre TODO el header
+    content: ""         -> obligatorio para que el pseudo-elemento exista (aunque esté vacío)
+    position: absolute  -> se posiciona respecto al padre (.products-header que tiene position: relative)
+    inset: 0            -> atajo para top:0, right:0, bottom:0, left:0 -> cubre TODO el header
     ----------------------------------
     background: linear-gradient(90deg, ...)
-        -> degradado HORIZONTAL que pasa por colores tipo RGB:
-        -> cyan (#00fff0) -> azul (#0040ff) -> púrpura (#8000ff) -> rosa (#ff00c8) -> rojo (#ff0040) -> cyan
-        -> Se repite el cyan al final para que el loop sea continuo (sin "salto")
+        -> degradado horizontal que pasa por colores tipo arcoíris:
+        -> rojo -> naranja -> amarillo -> verde -> cyan -> púrpura -> rojo
+        -> se repite el rojo al final para que el loop sea continuo (sin "salto")
     ----------------------------------
     background-size: 200% 100%
-        -> El degradado es el DOBLE de ancho que el contenedor
-        -> Esto permite que al mover el background-position se vea el efecto de deslizamiento
+        -> el degradado es el DOBLE de ancho que el contenedor
+        -> esto permite que al mover background-position se vea el efecto de deslizamiento
     ----------------------------------
-    animation: rgb-slide 6s linear infinite
-        -> Aplica la animación "rgb-slide" que definimos abajo:
-        -> 6s = duración de un ciclo completo
+    animation: rgb-slide 3s linear infinite
+        -> 3s = duración de un ciclo completo
         -> linear = velocidad constante (sin aceleración)
         -> infinite = se repite para siempre
     ----------------------------------
-    opacity: 0.25 
-        -> Solo se ve al 25% -> los colores se ven suaves, no agresivos
-        -> Sin esto se vería como un arcoíris encima y taparía todo el fondo oscuro
+    opacity: 0.25
+        -> solo se ve al 25% -> los colores se ven suaves, no agresivos
+        -> sin esto taparía el fondo oscuro con un arcoíris a todo volumen
     ----------------------------------
     pointer-events: none
-        -> Esta capa es solo visual, no debe interceptar clics
-        Sin esto, el overlay bloquearía los botones e inputs de abajo
+        -> esta capa es solo visual, no intercepta clics
+        -> sin esto bloquearía los botones e inputs de abajo
 */
 .products-header::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg,
-            #00fff0, #0040ff, #8000ff, #ff00c8, #ff0040, #00fff0);
+    background: linear-gradient(90deg, #ff0040, #ff8c00, #ffef00, #00ff88, #00cfff, #8b5cf6, #ff0040);
     background-size: 200% 100%;
-    animation: rgb-slide 6s linear infinite;
+    animation: rgb-slide 3s linear infinite;
     opacity: 0.25;
     pointer-events: none;
 }
 
 /* 
-    @Keyframes rgb-slide
-    -> Define la animación que mueve el degradado horizontalmente
+    Desvanecido en bordes (sombra interna)
     ----------------------------------
-    En 0%       -> background-position: 0% -> el degradado empieza en su posición normal
-    En 100%     -> background-position: 200% -> Se ha desplazado completamente a la derecha
+    ::before crea otro pseudo-elemento para oscurecer los bordes internos del header con una sombra tipo "viñeta", haciendo que los colores RGB se "apaguen" hacia las orillas.
+    ----------------------------------
+    content: ""         -> obligatorio
+    position: absolute  -> se posiciona dentro del header
+    inset: 0            -> cubre todo el header
+    ----------------------------------
+    box-shadow: inset 0 0 40px 20px rgba(0,0,0,0.5)
+        -> "inset" = la sombra va hacia ADENTRO (no hacia afuera)
+        -> oscurece los cuatro bordes internos suavemente
+    ----------------------------------
+    z-index: 1          -> se pone ENCIMA del ::after para que el desvanecido se vea sobre los colores RGB
+    pointer-events: none -> no bloquea clics
+    ----------------------------------
+    Con esto los colores RGB se van a "apagar" suavemente en los bordes, como si salieran de la oscuridad
+*/
+.products-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: 16px;
+    box-shadow: inset 0 0 40px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* 
+    @keyframes rgb-slide
+    ----------------------------------
+    Define la animación que mueve el degradado horizontalmente.
+    En 0%   -> background-position: 0%   -> el degradado empieza en su posición normal
+    En 100% -> background-position: 200% -> se ha desplazado completamente a la derecha
     ----------------------------------
     Como el degradado mide 200% del ancho (background-size: 200% 100%),
     al llegar a 200% vuelve al inicio sin "salto" visible -> loop infinito suave
 */
 @keyframes rgb-slide {
-    0% {
-        background-position: 0% 50%;
-    }
-
-    100% {
-        background-position: 200% 50%;
-    }
-}
-
-/* 
-    PASO 4: Desvanecido en bordes (sombra interna)
-    Vamos a oscurecer los bordes internos del header para que los colores RGB se "desvanezcan" hacia las orillas, dando un efecto de profundidad. Usamos el pseudo-elemento ::before
-    ----------------------------------
-    ::before crea otro pseudo-elemento, esta vez lo usamos para oscurecer los bordes internos del header con una sombra tipo "viñeta".
-    ----------------------------------
-    content: ""         -> Obligatorio
-    position: absolute  -> Se posiciona dentro del header
-    inset: 0            -> cubre todo el header (igual que ::after)
-    ----------------------------------
-    box-shadow: inset ...
-        -> "inset" significa que la sombra va HACIA ADENTRO (no hacia afuera)
-        -> Ponemos 4 sombras internas, una por cada lado:
-            inset 0 0 40px 10px rgba(0,0,0,0.7)     -> sombra general en todos los bordes
-            inset 0 30px 30px -10px rgba(0,0,0,0.5)     -> refuerzo en el borde SUPERIOR
-            inset 0 -30px 30px -10px rgba(0,0,0,0.7)     -> refuerzo en el borde INFERIOR
-            inset 30px 0 30px -10px rgba(0,0,0,0.7)     -> refuerzo en el borde DERECHO
-        -> rgba(0,0,0,0.7) = negro al 70% de opacidad
-        -> Los valores (desplazamiento-X, desplazamiento-Y, difuminado, expansión) controlan la posición y tamaño de cada sombra
-    ----------------------------------
-    pointer-events: none    -> no bloquea clics (igual que ::after)
-    z-index: 1              -> se pone ENCIMA del ::after (que tiene z-index auto/0) para que el desvanecido se vea sobre los colores RGB
-*/
-.products-header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    box-shadow:
-        inset 0 0 40px 10px rgba(0, 0, 0, 0.7),
-        inset 0 30px 30px -10px rgba(0, 0, 0, 0.5),
-        inset 0 -30px 30px -10px rgba(0, 0, 0, 0.5),
-        inset 30px 0 30px -10px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
-    z-index: 1;
-    /* Con esto los colores RGB se van a "apagar" suavemente en los bordes, como si salieran de la oscuridad */
-}
-
-/* 
-    PASO 5: Título con efecto glow/neón
-    Hace que el texto "Productos" brille en cyan como un letrero de neón
-    ----------------------------------
-    color: #fff         -> texto blanco para que constraste con el fondo oscuro
-    font-size: 2rem     -> tamaño grande para que se vea como título principal
-    font-weight: 800    -> extra-bold, grueso para dar presencia
-    letter-spacing: 4px -> separa las letras entre sí (estilo futurista/tech)
-    text-transform: uppercase   -> convierte "Productos" -> "PRODUCTOS"
-    ----------------------------------
-    text-shadow:    -> sombra detrás del texto, acá usamos MÚLTIPLES sombras separadas por comas para crear el efecto de brillo neón
-        0 0 10px rgba(0,255,240, 0.8)   -> brillo cercano, muy visible (80% opacidad) 
-        0 0 20px rgba(0,255,240, 0.6)   -> brillo medio, se difumina más
-        0 0 40px rgba(0,255,240, 0.4)   -> brillo lejano, suave
-        0 0 80px rgba(0,255,240, 0.8)   -> brillo muy lejano, apenas visible
-        -> rgba(0,255,240) = cyan, el mismo color del primer punto del degradado RGB
-        -> Cada sombra tiene más difuminado y menos opacidad = efecto de "resplandor"
-    ----------------------------------
-    position: relative  -> para que el texto quede ENCIMA de los pseudo-elementos
-    z-index: 2          -> por encima del ::before (z-index:1) y ::after (z-index:auto). Sin esto, las capas de color/sombra taparían el texto
-*/
-.products-title {
-    color: #fff;
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    text-shadow:
-        0 0 10px rgba(0, 255, 240, 0.8),
-        0 0 20px rgba(0, 255, 240, 0.6),
-        0 0 40px rgba(0, 255, 240, 0.4),
-        0 0 80px rgba(0, 255, 240, 0.2);
-    position: relative;
-    z-index: 2;
-    /* Se debe ver: El título "PRODUCTOS" en blanco con un resplandor cyan alrededor, como letrero de neón. Las letras se ven separadas y en mayúsculas */
-}
-
-/* 
-    PASO 6: Línea decorativa (divider)
-    La línea <hr> que separa el título de los controles, con degradado de colores
-    ----------------------------------
-    border: none    -> quita la línea gris por defecto del <hr>
-    height: 3px     -> grosor de la línea (más gruesa que el 1px por defecto)
-    ----------------------------------
-    background: linear-gradient(90deg, ...)
-        -> degradado horizontal con los mismos colores del overlay RGB: 
-            cyan -> púrpura -> rojo -> y luego transparent
-            el "transparent" al final hace que la línea se desvancezca hacia la derecha
-    ----------------------------------
-    margin-bottom: 1rem     -> espacio entre la línea y los controles de abajo
-    positiion: relative     -> para que quede encima de los pseudo-elementos
-    z-index: 2              -> misma capa que el título, por encima de ::before y ::after
-*/
-.products-title-divider {
-    border: none;
-    height: 3px;
-    background: linear-gradient(90deg, #00fff0, #8000ff, #ff0040, transparent);
-    margin-bottom: 1rem;
-    position: relative;
-    z-index: 2;
-    /* Se debe ver una línea delgada debajo del título que va de cyan a púrpura a rojo y se desvanece hacia la derecha */
-}
-
-/* 
-    Paso 7: Controles oscuros (botones e input)
-    Los botones e inputs se ven con los colores por defecto de Bootstrap (azul brillante, blanco).
-    Vamos a oscurecerlos para que se integren con el fondo
-    ----------------------------------
-    .products-header .btn -> selecciona TODOS los botones dentro del header
-    background: rgba(255,255,255, 0.08)
-        -> fondo casi transparente con un poquito de blanco (8%)
-        Esto hace que los botones se vean como "cristal oscuro"
-    ----------------------------------
-    border: 1px solid rgba(255,255,255, 0.15) 
-        -> borde blanco muy tenue (15%) para que se distinga del fondo
-    (255,255,255, 0.08)
-    ----------------------------------
-    color: #fff -> texto blanco
-    ----------------------------------
-    position: relative  -> para que el botón quede encima de las capas
-    z-index: 2          -> por encima de ::before y ::after
-    ----------------------------------
-    transition: all 0.3s ease -> cualquier cambio de estilo (como hover) será animado suavemente en 0.3 segundos
-*/
-.products-header .btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255,255,255, 0.15);
-    color: #fff;
-    position: relative;
-    z-index: 2;
-    transition: all 0.3s ease;
-}
-
-/* 
-    Input de búsqueda oscuro
-    Misma idea que los botones: fondo semi-transparente oscuro
-    ----------------------------------
-    color: #fff     -> texto que escribe el usuario en blanco 
-    &::placeholder  -> estilo del texto gris que dice "Busca por nombre..." rgba(255,255,255, 0.5)  -> blanco al 50% para que se vea pero no distraiga
-*/
-.products-header .form-control {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255,255,255, 0.15);
-    color: #fff;
-    position: relative;
-    z-index: 2; 
-}
-.products-header .form-control::placeholder {
-    color: rgba(255,255,255, 0.5);
-}
-
-/* 
-    Cuando el input tiene foco (el usuario hizo clic para escribir):
-    ----------------------------------
-    background -> un poco más claro (12% en vez de 8%) para indicar que está activo
-    border-color: #00fff0   -> borde cyan para resaltar
-    box-shadow: 0 0 8px rgba(0,255,240, 0.4)    -> brillo cyan alrededor (como el título)
-    color: #fff -> mantener texto blanco
-*/
-.products-header .form-control:focus {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: #00fff0;
-    box-shadow: 0 0 8px rgba(0,255,240, 0.4);
-    color: #fff;
-    /* Se deben ver los botones e input más oscuros/transparentes, integrados con el fondo. Al hacer clic en el input, brilla con un borde cyan */
-}
-
-/* 
-    PASO 8: Animación de botones
-    El toque final: los botones pulsan suavemente y brillan cuando pasas el ratón
-    ----------------------------------
-    Efecto HOVER (cuando el raton pasa encima):
-    transform: scale(1.05)  -> el botón crece un 5% (se agranda ligeramente)
-    filter: brightness(1.3) -> aumenta el brillo en un 30%
-    box-shadow: 0 0 15px rgba(0,255,240, 0.3)   -> resplandor cyan alrededor
-    ----------------------------------
-    Todo esto se anima suavemente gracias al transition: all 0.3s ease del paso 7
-*/
-.products-header .btn:hover {
-    transform: scale(1.05);
-    filter: brightness(1.3);
-    box-shadow: 0 0 15px rgba(0,255,240, 0.3)
-}
-
-/* 
-    Animación de PULSO continuo:
-    animation: btn-glow-pulse 3s ease-in-out infinite
-        -> 3s = un ciclo dura 3 segundos
-        -> ease-in-out = empieza lento, acelera, termina lento (suave)
-        -> infinite = se repite para siempre
-    ----------------------------------
-    El keyframe alterna entre una sombra sutil y una más intensa, creando un efecto de "respiración" o "latido" en los botones
-*/
-.products-header .btn {
-    animation: btn-glow-pulse 3s ease-in-out infinite;
+    0% { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
 }
 
 /* 
     @keyframes btn-glow-pulse
     ----------------------------------
-    0%      -> sombra muy sutil (casi invisible)
-    50%     -> sombra más grande y visible -> el botón "brilla"
-    100%    -> vuelve a la sombra sutil -> efecto de respiración
+    0%, 100% -> sombra muy sutil (casi invisible)
+    50%      -> sombra más grande y visible -> el botón "brilla"
+    -> efecto de "respiración" o "latido" continuo en los botones
     ----------------------------------
-    rgba(0,255,240) = cyan, consistente con todo el tema
+    Se deben de ver los botones como "respirando" con un brillo suave cyan. Al pasar el ratón, se agrandan un poco y brillan más
 */
 @keyframes btn-glow-pulse {
-    0%      { box-shadow: 0 0 5px rgba(0, 255, 240, 0.1); }
-    50%     { box-shadow: 0 0 20px rgba(0, 255, 240, 0.3); }
-    100%    { box-shadow: 0 0 5px rgba(0, 255, 240, 0.1); }
-    /* Se deben de ver los botones como "respirando" con un brillo suave cyan. Al pasar el ratón, se agrandan un poco y brillan más */
+    0%, 100% { box-shadow: 0 0 8px rgba(0, 207, 255, 0.2); }
+    50% { box-shadow: 0 0 18px rgba(0, 207, 255, 0.5), 0 0 30px rgba(139, 92, 246, 0.2); }
+}
+
+/* 
+    Título con efecto glow/neón
+    ----------------------------------
+    color: #fff         -> texto blanco para que contraste con el fondo oscuro
+    font-size: 2rem     -> tamaño grande para título principal
+    font-weight: 800    -> extra-bold para dar presencia
+    letter-spacing: 4px -> separa las letras (estilo futurista/tech)
+    text-transform: uppercase -> convierte "Productos" -> "PRODUCTOS"
+    ----------------------------------
+    text-shadow -> múltiples sombras para crear el efecto de brillo neón:
+        0 0 15px rgba(0,207,255, 0.8) -> brillo cercano, muy visible
+        0 0 30px rgba(0,207,255, 0.5) -> brillo medio
+        0 0 60px rgba(0,207,255, 0.3) -> brillo lejano, suave
+        0 0 20px rgba(139,92,246, 0.4) -> toque de púrpura
+        2px 2px 0 rgba(0,0,0, 0.5)   -> sombra sólida para legibilidad
+    ----------------------------------
+    position: relative / z-index: 2 -> el texto queda ENCIMA de ::before y ::after
+    ----------------------------------
+    Se debe ver: el título "PRODUCTOS" en blanco con un resplandor cyan alrededor, como letrero de neón. Las letras se ven separadas y en mayúsculas
+*/
+.products-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow:
+        0 0 15px rgba(0, 207, 255, 0.8),
+        0 0 30px rgba(0, 207, 255, 0.5),
+        0 0 60px rgba(0, 207, 255, 0.3),
+        0 0 20px rgba(139, 92, 246, 0.4),
+        2px 2px 0 rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* 
+    Línea decorativa (divider)
+    ----------------------------------
+    border: none    -> quita la línea gris por defecto del <hr>
+    height: 3px     -> grosor de la línea
+    ----------------------------------
+    background: linear-gradient(to right, ...)
+        -> degradado horizontal con los mismos colores del overlay RGB:
+        -> cyan -> púrpura -> rojo -> transparent
+        -> el "transparent" al final hace que la línea se desvanezca hacia la derecha
+    ----------------------------------
+    position: relative / z-index: 2 -> misma capa que el título, por encima de ::before y ::after
+    ----------------------------------
+    Se debe ver una línea delgada debajo del título que va de cyan a púrpura a rojo y se desvanece hacia la derecha
+*/
+.products-title-divider {
+    height: 3px;
+    border: none;
+    border-radius: 2px;
+    background: linear-gradient(to right, #00cfff, #8b5cf6, #ff0040, transparent);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+    position: relative;
+    z-index: 2;
+}
+
+/* 
+    Botones oscuros con glow dentro del header
+    ----------------------------------
+    background: rgba(255,255,255, 0.08) -> fondo casi transparente (8% blanco) -> aspecto "cristal oscuro"
+    border: 1px solid rgba(255,255,255, 0.2) -> borde blanco muy tenue para distinguirse del fondo
+    color: #fff -> texto blanco
+    ----------------------------------
+    animation: btn-glow-pulse 3s ease-in-out infinite -> efecto de "respiración" continuo
+    transition: all 0.3s ease -> cualquier cambio de estilo (hover) se anima suavemente
+    ----------------------------------
+    position: relative / z-index: 2 -> por encima de las capas de efectos
+*/
+.products-header .btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    animation: btn-glow-pulse 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+/* 
+    Hover de botones
+    ----------------------------------
+    background -> más visible con tinte cyan (20%)
+    border-color -> cyan más intenso
+    box-shadow -> resplandor cyan + toque de púrpura alrededor
+    transform: scale(1.05) -> el botón crece un 5% al pasar el ratón
+    animation: none -> se detiene el pulso para no interferir con el hover
+*/
+.products-header .btn:hover {
+    background: rgba(0, 207, 255, 0.2);
+    border-color: rgba(0, 207, 255, 0.6);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0, 207, 255, 0.6), 0 0 40px rgba(139, 92, 246, 0.3);
+    transform: scale(1.05);
+    animation: none;
+}
+
+.products-header .btn.btn-primary {
+    background: rgba(0, 207, 255, 0.15);
+    border-color: rgba(0, 207, 255, 0.4);
+}
+
+.products-header .btn-primary:hover {
+    background: rgba(0, 207, 255, 0.3);
+    border-color: rgba(0, 207, 255, 0.7);
+}
+
+/* Botones de vista: activo vs inactivo */
+.products-header .btn-outline-primary {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 
+    Input de búsqueda oscuro
+    ----------------------------------
+    Misma idea que los botones: fondo semi-transparente oscuro para integrarse con el header
+    ----------------------------------
+    color: #fff -> texto que escribe el usuario en blanco
+    ::placeholder -> blanco al 50% para que se vea pero no distraiga
+*/
+.products-header .form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.products-header .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* 
+    Focus del input (cuando el usuario hace clic para escribir)
+    ----------------------------------
+    background -> un poco más claro (15%) para indicar que está activo
+    border-color: #00cfff -> borde cyan para resaltar
+    box-shadow -> brillo cyan alrededor (consistente con el tema)
+    ----------------------------------
+    Se deben ver los botones e input más oscuros/transparentes, integrados con el fondo. Al hacer clic en el input, brilla con un borde cyan
+*/
+.products-header .form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #00cfff;
+    box-shadow: 0 0 8px rgba(0, 207, 255, 0.3);
+    color: #fff;
+}
+
+/* z-index: 2 para que el contenido del row quede encima de los pseudo-elementos */
+.products-header .row {
+    position: relative;
+    z-index: 2;
 }
