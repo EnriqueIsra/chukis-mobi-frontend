@@ -5,6 +5,7 @@ import { ClientCard } from "../components/clients/ClientCard";
 import { ClientModal } from "../components/clients/ClientModal";
 import Swal from "sweetalert2";
 import { findAll, create, update, remove } from "../services/clientService";
+import { ModuleHeader } from "../components/common/ModuleHeader";
 
 export const ClientsPage = () => {
 
@@ -115,17 +116,27 @@ export const ClientsPage = () => {
 
     return (
         <>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="mb-0">Clientes</h2>
-                <button
-                    className="btn btn-primary"
-                    onClick={handlerOpenModal}
-                >
-                    <i className="bi bi-plus-lg"></i> Agregar Cliente
-                </button>
-            </div>
+            <ModuleHeader title="Clientes">
+                <div className="col-12 col-lg-auto">
+                    <button className="btn btn-primary w-100" onClick={handlerOpenModal}>
+                        <i className="bi bi-plus-lg"></i> Agregar Nuevo Cliente
+                    </button>
+                </div>
 
-            <ClientsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+                <div className="col-12 col-lg">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nombre, teléfono, dirección o email..."
+                    />
+                </div>
+
+                <div className="col-12 col-lg-auto">
+                    <ClientsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+                </div>
+            </ModuleHeader>
+
+
 
             {viewMode === "table" ? (
                 <div className="row">

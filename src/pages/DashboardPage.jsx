@@ -18,6 +18,7 @@ import RentalDetailModal from "../components/rentals/RentalDetailModal";
 import PaymentModal from "../components/payments/PaymentModal";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 
+import { ModuleHeader } from "../components/common/ModuleHeader";
 /*  
   Página principal del dashboard
   Muestra estadísticas y acciones rápidas
@@ -314,17 +315,17 @@ export const DashboardPage = () => {
   return (
     <>
       {/* Header con el titulo y botón actualizar, onClick ahora llama a fetchAllData para recargar todo, no solo las stats */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">Dashboard</h2>
-        <button
-          className="btn btn-outline-secondary btn-sm"
-          onClick={fetchAllData}
-          disabled={loading}
-        >
-          <i className={`bi bi-arrow-clockwise ${loading ? 'spin' : ''}`}></i>
-          {' '}Actualizar
-        </button>
-      </div>
+      <ModuleHeader title="Dashboard">
+        <div className="col-12 col-lg-auto">
+          <button
+            className="btn btn-outline-secondary w-100"
+            onClick={fetchAllData}
+          >
+            <i className={`bi bi-arrow-clockwise ${loading ? 'spin' : ''}`}></i>
+            {' '}Actualizar
+          </button>
+        </div>
+      </ModuleHeader>
 
       {/* Acciones rápidas */}
       <QuickActions />

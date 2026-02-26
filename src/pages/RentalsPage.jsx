@@ -7,6 +7,7 @@ import { RentalCard } from "../components/rentals/RentalCard";
 import { findAll, remove, updateRentalStatus } from "../services/rentalService";
 import PaymentModal from "../components/payments/PaymentModal"  // Importamos el componente PaymentModal
 import RentalDetailModal from "../components/rentals/RentalDetailModal";
+import { ModuleHeader } from "../components/common/ModuleHeader";
 
 export const RentalsPage = () => {
   const [rentals, setRentals] = useState([]);
@@ -184,19 +185,25 @@ export const RentalsPage = () => {
 
   return (
     <>
-      {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Rentas</h2>
-        <button
-          className="btn btn-primary"
-          onClick={handlerOpenWizard}
-        >
-          <i className="bi bi-plus-lg"></i> Nueva Renta
-        </button>
-      </div>
+      <ModuleHeader title="Rentas">
+        <div className="col-12 col-lg-auto">
+          <button className="btn btn-primary w-100" onClick={handlerOpenWizard}>
+            <i className="bi bi-plus-lg"></i> Agregar Nueva Renta
+          </button>
+        </div>
 
-      {/* Toolbar (table / cards) */}
-      <RentalsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+        <div className="col-12 col-lg">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Buscar por cliente, fecha, dirección o estado..."
+          />
+        </div>
+
+        <div className="col-12 col-lg-auto">
+          <RentalsToolbar viewMode={viewMode} setViewMode={setViewMode} />
+        </div>
+      </ModuleHeader>
 
       {/* Loading */}
       {loading ? (

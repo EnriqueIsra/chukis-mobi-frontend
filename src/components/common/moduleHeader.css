@@ -1,4 +1,17 @@
-/* Aquí irán los estilos del header de productos */
+/* 
+    ModuleHeader - Estilos reutilizables
+    ----------------------------------
+    Estas clases usan el prefijo "module-" en vez de "products-"
+    para que cualquier módulo las pueda usar.
+    La estructura es:
+        .module-header          -> contenedor principal (fondo oscuro + efectos)
+        .module-header::after   -> overlay RGB animado
+        .module-header::before  -> desvanecido en bordes
+        .module-title           -> título con glow neón
+        .module-title-divider   -> línea decorativa
+        .module-header .btn     -> botones oscuros con animación
+        .module-header .form-control    -> inputs oscuros
+*/
 
 /* 
     Fondo oscuro con degradado
@@ -17,7 +30,7 @@
     ----------------------------------
     overflow: hidden -> recorta cualquier efecto visual que se salga de los bordes redondeados (importante para las animaciones RGB)
 */
-.products-header {
+.module-header {
     background: linear-gradient(135deg, #0f0f0f, #1a1a2e, #16213e, #0f3460);
     border-radius: 16px;
     padding: 1.5rem;
@@ -58,7 +71,7 @@
         -> esta capa es solo visual, no intercepta clics
         -> sin esto bloquearía los botones e inputs de abajo
 */
-.products-header::after {
+.module-header::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -87,7 +100,7 @@
     ----------------------------------
     Con esto los colores RGB se van a "apagar" suavemente en los bordes, como si salieran de la oscuridad
 */
-.products-header::before {
+.module-header::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -98,7 +111,7 @@
 }
 
 /* 
-    @keyframes rgb-slide
+    @keyframes rgb-slide - Animación del degradado RGB
     ----------------------------------
     Define la animación que mueve el degradado horizontalmente.
     En 0%   -> background-position: 0%   -> el degradado empieza en su posición normal
@@ -113,7 +126,7 @@
 }
 
 /* 
-    @keyframes btn-glow-pulse
+    @keyframes btn-glow-pulse - Animación de pulso de botones
     ----------------------------------
     0%, 100% -> sombra muy sutil (casi invisible)
     50%      -> sombra más grande y visible -> el botón "brilla"
@@ -146,7 +159,7 @@
     ----------------------------------
     Se debe ver: el título "PRODUCTOS" en blanco con un resplandor cyan alrededor, como letrero de neón. Las letras se ven separadas y en mayúsculas
 */
-.products-title {
+.module-title {
     font-size: 2rem;
     font-weight: 800;
     letter-spacing: 4px;
@@ -178,7 +191,7 @@
     ----------------------------------
     Se debe ver una línea delgada debajo del título que va de cyan a púrpura a rojo y se desvanece hacia la derecha
 */
-.products-title-divider {
+.module-title-divider {
     height: 3px;
     border: none;
     border-radius: 2px;
@@ -201,7 +214,7 @@
     ----------------------------------
     position: relative / z-index: 2 -> por encima de las capas de efectos
 */
-.products-header .btn {
+.module-header .btn {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
@@ -218,7 +231,7 @@
     transform: scale(1.05) -> el botón crece un 5% al pasar el ratón
     animation: none -> se detiene el pulso para no interferir con el hover
 */
-.products-header .btn:hover {
+.module-header .btn:hover {
     background: rgba(0, 207, 255, 0.2);
     border-color: rgba(0, 207, 255, 0.6);
     color: #fff;
@@ -227,18 +240,18 @@
     animation: none;
 }
 
-.products-header .btn.btn-primary {
+.module-header .btn.btn-primary {
     background: rgba(0, 207, 255, 0.15);
     border-color: rgba(0, 207, 255, 0.4);
 }
 
-.products-header .btn-primary:hover {
+.module-header .btn-primary:hover {
     background: rgba(0, 207, 255, 0.3);
     border-color: rgba(0, 207, 255, 0.7);
 }
 
 /* Botones de vista: activo vs inactivo */
-.products-header .btn-outline-primary {
+.module-header .btn-outline-primary {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 0.7);
@@ -252,13 +265,13 @@
     color: #fff -> texto que escribe el usuario en blanco
     ::placeholder -> blanco al 50% para que se vea pero no distraiga
 */
-.products-header .form-control {
+.module-header .form-control {
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
 }
 
-.products-header .form-control::placeholder {
+.module-header .form-control::placeholder {
     color: rgba(255, 255, 255, 0.5);
 }
 
@@ -271,7 +284,7 @@
     ----------------------------------
     Se deben ver los botones e input más oscuros/transparentes, integrados con el fondo. Al hacer clic en el input, brilla con un borde cyan
 */
-.products-header .form-control:focus {
+.module-header .form-control:focus {
     background: rgba(255, 255, 255, 0.15);
     border-color: #00cfff;
     box-shadow: 0 0 8px rgba(0, 207, 255, 0.3);
@@ -279,7 +292,7 @@
 }
 
 /* z-index: 2 para que el contenido del row quede encima de los pseudo-elementos */
-.products-header .row {
+.module-header .row {
     position: relative;
     z-index: 2;
 }

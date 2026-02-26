@@ -5,7 +5,7 @@ import { ProductCard } from "../components/products/ProductCard";
 import { ProductModal } from "../components/products/ProductModal";
 import Swal from "sweetalert2";
 import { findAll, create, update, remove } from "../services/productService";
-import "./productsPage.css";
+import { ModuleHeader } from "../components/common/ModuleHeader";
 
 export const ProductsPage = () => {
 
@@ -53,7 +53,7 @@ export const ProductsPage = () => {
             return (
                 product.name?.toLowerCase().includes(search) ||
                 product.description?.toLowerCase().includes(search) ||
-                product.color?.toLowerCase().includes(search) || 
+                product.color?.toLowerCase().includes(search) ||
                 String(product.price).includes(search)
             );
         })
@@ -156,52 +156,33 @@ export const ProductsPage = () => {
                 1.- El título + línea decorativa
                 2.- Los controles en un row responsivo de Bootstrap
             */}
-            <div className="products-header">
-                {/* Título con clase para estilos de glow/neón */}
-                <h2 className="products-title">Productos</h2>
-
-                {/* Línea decorativa que separa título de controles */}
-                <hr className="products-title-divider" />
-
-                {/* 
-                    Controles de row de Bootstrap:
-                    - g-2 -> gap de 0.5rem entre columnas
-                    - align-items-center -> centra verticalmente
-                    - Cada col-12 -> ocupa todo el ancho en pantalla chica (se apilan)
-                    - Cada col-lg-auto o col-lg -> en pantalla grande se ponen en fila
-                */}
-                <div className="row align-items-center g-2">
-                    
-                    {/* col-lg-auto -> toma solo el ancho del botón en pantalla grande */}
-                    <div className="col-12 col-lg-auto">
-                        <button
-                            className="btn btn-primary w-100"
-                            onClick={handlerOpenModal}
-                        >
-                            <i className="bi bi-plus-lg"></i> Agregar Nuevo Producto
-                        </button>
-                    </div>
-
-                    {/* col-lg (sin número) -> toma TODO el espacio restante en pantalla grande */}
-                    <div className="col-12 col-lg">
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Buscar por nombre, descripción, precio o color..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-
-                    {/* col-lg-auto -> toma solo el ancho de los botones en pantalla grande */}
-                    <div className="col-12 col-lg-auto">
-                        <ProductsToolbar
-                            viewMode={viewMode}
-                            setViewMode={setViewMode}
-                        />
-                    </div>
+            <ModuleHeader title="Productos">
+                <div className="col-12 col-lg-auto">
+                    <button
+                        className="btn btn-primary w-100"
+                        onClick={handlerOpenModal}
+                    >
+                        <i className="bi bi-plus-lg"></i> Agregar Nuevo Producto
+                    </button>
                 </div>
-            </div>
+
+                <div className="col-12 col-lg">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Buscar por nombre, descripción, precio o color..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+
+                <div className="col-12 col-lg-auto">
+                    <ProductsToolbar
+                        viewMode={viewMode}
+                        setViewMode={setViewMode}
+                    />
+                </div>
+            </ModuleHeader>
             {/* ====== FIN HEADER ====== */}
 
             {viewMode === "table" ? (

@@ -1,22 +1,22 @@
 export const UsersToolbar = ({ viewMode, setViewMode }) => {
   return (
-    <div className="d-flex justify-content-end mb-3 gap-2">
+    <div className="d-flex gap-2 w-100">
       <button
-        className={`btn btn-sm ${
+        className={`btn flex-grow-1 ${
           viewMode === "table" ? "btn-primary" : "btn-outline-primary"
         }`}
         onClick={() => setViewMode("table")}
       >
-        <i className="bi bi-table"></i>
+        <i className="bi bi-table"></i> Ver Tabla
       </button>
 
       <button
-        className={`btn btn-sm ${
+        className={`btn flex-grow-1 ${
           viewMode === "cards" ? "btn-primary" : "btn-outline-primary"
         }`}
         onClick={() => setViewMode("cards")}
       >
-        <i className="bi bi-grid-3x3-gap"></i>
+        <i className="bi bi-grid-3x3-gap"></i> Ver Cuadrícula
       </button>
     </div>
   );

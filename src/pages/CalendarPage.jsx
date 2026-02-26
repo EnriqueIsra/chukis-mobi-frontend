@@ -9,6 +9,7 @@ import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import "./CalendarPage.css";
 import RentalDetailModal from "../components/rentals/RentalDetailModal";
 import PaymentModal from "../components/payments/PaymentModal";
+import { ModuleHeader } from "../components/common/ModuleHeader";
 
 // Colores según status
 const statusColors = {
@@ -260,36 +261,46 @@ export const CalendarPage = () => {
   return (
     <div className="calendar-page">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">
-          <i className="bi bi-calendar3 me-2"></i>
-          Calendario de Rentas
-        </h2>
-        <button
-          className="btn btn-primary"
-          onClick={() => {
-            setRentalToEdit(null);
-            setSelectedDate(null);
-            setIsWizardOpen(true);
-          }}
-        >
-          <i className="bi bi-plus-lg me-1"></i> Nueva Renta
-        </button>
-      </div>
 
-      {/* Leyenda de colores */}
-      <div className="calendar-legend mb-3">
-        <span className="legend-title">Estado:</span>
-        {Object.entries(statusColors).map(([status, colors]) => (
-          <span
-            key={status}
-            className="legend-item"
-            style={{ backgroundColor: colors.bg, color: colors.text }}
+      <ModuleHeader title="Calendario">
+        <div className="col-12 col-lg-auto">
+          <button
+            className="btn btn-primary w-100"
+            onClick={() => {
+              setRentalToEdit(null);
+              setSelectedDate(null);
+              setIsWizardOpen(true);
+            }}
           >
-            {statusLabels[status]}
-          </span>
-        ))}
-      </div>
+            <i className="bi bi-plus-lg me-1"></i> Agregar Nueva Renta
+          </button>
+        </div>
+
+        <div className="col-12 col-lg">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Buscar por cliente, fecha, dirección o estado..."
+          />
+        </div>
+
+        <div className="col-12 col-lg-auto">
+          {/* Leyenda de colores */}
+          <div className="calendar-legend">
+            <span className="legend-title">Estado:</span>
+            {Object.entries(statusColors).map(([status, colors]) => (
+              <span
+                key={status}
+                className="legend-item"
+                style={{ backgroundColor: colors.bg, color: colors.text }}
+              >
+                {statusLabels[status]}
+              </span>
+            ))}
+          </div>
+        </div>
+
+      </ModuleHeader>
 
       {/* Calendario */}
       {loading ? (
