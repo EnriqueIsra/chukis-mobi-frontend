@@ -253,3 +253,49 @@
     color: #fff;
     /* Se deben ver los botones e input más oscuros/transparentes, integrados con el fondo. Al hacer clic en el input, brilla con un borde cyan */
 }
+
+/* 
+    PASO 8: Animación de botones
+    El toque final: los botones pulsan suavemente y brillan cuando pasas el ratón
+    ----------------------------------
+    Efecto HOVER (cuando el raton pasa encima):
+    transform: scale(1.05)  -> el botón crece un 5% (se agranda ligeramente)
+    filter: brightness(1.3) -> aumenta el brillo en un 30%
+    box-shadow: 0 0 15px rgba(0,255,240, 0.3)   -> resplandor cyan alrededor
+    ----------------------------------
+    Todo esto se anima suavemente gracias al transition: all 0.3s ease del paso 7
+*/
+.products-header .btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.3);
+    box-shadow: 0 0 15px rgba(0,255,240, 0.3)
+}
+
+/* 
+    Animación de PULSO continuo:
+    animation: btn-glow-pulse 3s ease-in-out infinite
+        -> 3s = un ciclo dura 3 segundos
+        -> ease-in-out = empieza lento, acelera, termina lento (suave)
+        -> infinite = se repite para siempre
+    ----------------------------------
+    El keyframe alterna entre una sombra sutil y una más intensa, creando un efecto de "respiración" o "latido" en los botones
+*/
+.products-header .btn {
+    animation: btn-glow-pulse 3s ease-in-out infinite;
+}
+
+/* 
+    @keyframes btn-glow-pulse
+    ----------------------------------
+    0%      -> sombra muy sutil (casi invisible)
+    50%     -> sombra más grande y visible -> el botón "brilla"
+    100%    -> vuelve a la sombra sutil -> efecto de respiración
+    ----------------------------------
+    rgba(0,255,240) = cyan, consistente con todo el tema
+*/
+@keyframes btn-glow-pulse {
+    0%      { box-shadow: 0 0 5px rgba(0, 255, 240, 0.1); }
+    50%     { box-shadow: 0 0 20px rgba(0, 255, 240, 0.3); }
+    100%    { box-shadow: 0 0 5px rgba(0, 255, 240, 0.1); }
+    /* Se deben de ver los botones como "respirando" con un brillo suave cyan. Al pasar el ratón, se agrandan un poco y brillan más */
+}
