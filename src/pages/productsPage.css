@@ -57,7 +57,7 @@
     pointer-events: none
         -> Esta capa es solo visual, no debe interceptar clics
         Sin esto, el overlay bloquearía los botones e inputs de abajo
-*/
+*/ 
 .products-header::after {
     content: "";
     position: absolute;
@@ -87,6 +87,7 @@
 
 /* 
     PASO 4: Desvanecido en bordes (sombra interna)
+    Vamos a oscurecer los bordes internos del header para que los colores RGB se "desvanezcan" hacia las orillas, dando un efecto de profundidad. Usamos el pseudo-elemento ::before
     ----------------------------------
     ::before crea otro pseudo-elemento, esta vez lo usamos para oscurecer los bordes internos del header con una sombra tipo "viñeta".
     ----------------------------------
@@ -118,4 +119,67 @@
         inset 30px 0 30px -10px rgba(0, 0, 0, 0.4);
     pointer-events: none;
     z-index: 1;
+    /* Con esto los colores RGB se van a "apagar" suavemente en los bordes, como si salieran de la oscuridad */
+}
+
+/* 
+    PASO 5: Título con efecto glow/neón
+    Hace que el texto "Productos" brille en cyan como un letrero de neón
+    ----------------------------------
+    color: #fff         -> texto blanco para que constraste con el fondo oscuro
+    font-size: 2rem     -> tamaño grande para que se vea como título principal
+    font-weight: 800    -> extra-bold, grueso para dar presencia
+    letter-spacing: 4px -> separa las letras entre sí (estilo futurista/tech)
+    text-transform: uppercase   -> convierte "Productos" -> "PRODUCTOS"
+    ----------------------------------
+    text-shadow:    -> sombra detrás del texto, acá usamos MÚLTIPLES sombras separadas por comas para crear el efecto de brillo neón
+        0 0 10px rgba(0,255,240, 0.8)   -> brillo cercano, muy visible (80% opacidad) 
+        0 0 20px rgba(0,255,240, 0.6)   -> brillo medio, se difumina más
+        0 0 40px rgba(0,255,240, 0.4)   -> brillo lejano, suave
+        0 0 80px rgba(0,255,240, 0.8)   -> brillo muy lejano, apenas visible
+        -> rgba(0,255,240) = cyan, el mismo color del primer punto del degradado RGB
+        -> Cada sombra tiene más difuminado y menos opacidad = efecto de "resplandor"
+    ----------------------------------
+    position: relative  -> para que el texto quede ENCIMA de los pseudo-elementos
+    z-index: 2          -> por encima del ::before (z-index:1) y ::after (z-index:auto). Sin esto, las capas de color/sombra taparían el texto
+*/
+.products-title {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-shadow: 
+        0 0 10px rgba(0, 255, 240, 0.8),
+        0 0 20px rgba(0, 255, 240, 0.6),
+        0 0 40px rgba(0, 255, 240, 0.4),
+        0 0 80px rgba(0, 255, 240, 0.2);
+    position: relative;
+    z-index: 2;
+    /* Se debe ver: El título "PRODUCTOS" en blanco con un resplandor cyan alrededor, como letrero de neón. Las letras se ven separadas y en mayúsculas */
+}
+
+/* 
+    PASO 6: Línea decorativa (divider)
+    La línea <hr> que separa el título de los controles, con degradado de colores
+    ----------------------------------
+    border: none    -> quita la línea gris por defecto del <hr>
+    height: 3px     -> grosor de la línea (más gruesa que el 1px por defecto)
+    ----------------------------------
+    background: linear-gradient(90deg, ...)
+        -> degradado horizontal con los mismos colores del overlay RGB: 
+            cyan -> púrpura -> rojo -> y luego transparent
+            el "transparent" al final hace que la línea se desvancezca hacia la derecha
+    ----------------------------------
+    margin-bottom: 1rem     -> espacio entre la línea y los controles de abajo
+    positiion: relative     -> para que quede encima de los pseudo-elementos
+    z-index: 2              -> misma capa que el título, por encima de ::before y ::after
+*/
+.products-title-divider {
+    border: none;
+    height: 3px;
+    background: linear-gradient(90deg, #00fff0, #8000ff, #ff0040, transparent);
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
 }
