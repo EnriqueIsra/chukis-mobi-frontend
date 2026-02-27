@@ -337,3 +337,55 @@
 .fc-view-harness {
   transition: height 0.3s ease;
 }
+
+/* 
+  Leyenda de colores de status dentro del header oscuro
+  -----------------------------
+  Contenedor de la leyenda: oscuro con breathing como los botones
+*/
+.module-header .calendar-legend {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: btn-glow-pulse 3s ease-in-out infinite;
+}
+
+/* Título "Estado" en blanco */
+.module-header .legend-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Cada etiqueta de status: oscura con borde de su color */
+.module-header .legend-item {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--status-color);
+  color: var(--status-color);
+  transition: all 0.3s ease;
+  animation: legend-item-pulse 3s ease-in-out infinite;
+}
+
+.module-header .legend-item:hover {
+  transform: scale(1.1);
+  filter: brightness(1.4);
+}
+
+/* 
+  Breathing con el color de cada status 
+  Usa --status-glow (versión más brillante) para el box-shadow y --status-color (original) para el borde y el texto
+*/
+@keyframes legend-item-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px transparent;
+    opacity: 0.75;
+  }
+  50% {
+    box-shadow:
+      0 0 12px var(--status-glow),
+      0 0 24px var(--status-glow);
+    opacity: 1;
+  }
+}
+
+/* Contenedor del calendario */
+.calendar-container {
+  background: #fff;
+}

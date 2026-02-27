@@ -13,10 +13,10 @@ import { ModuleHeader } from "../components/common/ModuleHeader";
 
 // Colores según status
 const statusColors = {
-  CREATED: { bg: "#0dcaf0", border: "#0aa2c0", text: "#000" },      // info/azul
-  DELIVERED: { bg: "#ffc107", border: "#d39e00", text: "#000" },    // warning/amarillo
-  PICKED_UP: { bg: "#198754", border: "#146c43", text: "#fff" },    // success/verde
-  CANCELLED: { bg: "#dc3545", border: "#b02a37", text: "#fff" }     // danger/rojo
+  CREATED: { bg: "#0dcaf0", border: "#0aa2c0", text: "#000", glow: "#0dcaf0" },      // info/azul
+  DELIVERED: { bg: "#ffc107", border: "#d39e00", text: "#000", glow: "#ffe066" },    // warning/amarillo (glow más suave)
+  PICKED_UP: { bg: "#198754", border: "#146c43", text: "#fff", glow: "#00ff88" },    // success/verde (glow más brillante)
+  CANCELLED: { bg: "#dc3545", border: "#b02a37", text: "#fff", glow: "#ff4d6a" }     // danger/rojo (glow más brillante)
 };
 
 const statusLabels = {
@@ -292,7 +292,7 @@ export const CalendarPage = () => {
               <span
                 key={status}
                 className="legend-item"
-                style={{ backgroundColor: colors.bg, color: colors.text }}
+                style={{ '--status-color': colors.bg, '--status-glow': colors.glow }}
               >
                 {statusLabels[status]}
               </span>
