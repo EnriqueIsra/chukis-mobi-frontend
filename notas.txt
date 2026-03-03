@@ -1,0 +1,45 @@
+Está muy bien que quieras pensar esto bien antes de codear — un módulo bien definido desde el inicio ahorra mucho retrabajo. Vamos a desmenuzar todo lo que me dices:
+
+Separemos en 3 conceptos distintos
+Lo que me describes realmente son 3 cosas diferentes, y mezclarlas en un solo módulo haría todo confuso:
+
+1. Gastos operativos (el módulo que vamos a hacer ahora)
+Gastos del día a día del negocio:
+
+Categoría	Ejemplos
+Transporte / Gasolina	Cargar gas para entregas
+Mantenimiento vehicular	Llantas, taller, aceite, refacciones
+Limpieza y mantenimiento	Productos de limpieza para mobiliario o camionetas
+Compras de inventario	Comprar mesas nuevas, sillas, manteles
+Otros	Cualquier gasto que no entre en las anteriores
+Cada gasto tendría:
+
+Monto
+Fecha
+Categoría
+Descripción (ejemplo: "Gasolina para entrega en Col. Centro")
+Opcional: asociar a una renta específica (para saber cuánto te costó esa renta)
+Opcional: foto del ticket/comprobante
+2. Pagos a chambeadores (módulo aparte, después)
+Esto sí es mejor manejarlo separado porque:
+
+Va ligado a un trabajador específico (entidad User)
+Posiblemente ligado a una renta específica ("te pago $300 por la chamba de la renta #45")
+Quieres saber cuánto le has pagado a cada chambeador en el mes
+Es un gasto sí, pero con lógica diferente
+Esto lo podemos hacer como un módulo "Nómina" o "Pagos a chambeadores" después del de gastos.
+
+3. Mobiliario subcontratado / Proveedores (el caso de la socia)
+Esto es clave y te lo simplifico: es un costo asociado a una renta. Pensémoslo así:
+
+Renta #45: 25 mesas a $3,000
+
+20 mesas son tuyas (costo = $0)
+5 mesas se las pides a la socia a $50 c/u = $250
+Tu ganancia real: $3,000 - $250 = $2,750
+La forma más limpia de manejar esto es tener un concepto de "Proveedor" y registrar "Productos externos" por renta:
+
+Registras a la socia como proveedor (nombre, teléfono)
+En una renta, marcas: "5 mesas vinieron de [Socia] a $50 c/u"
+Eso se registra como un costo de la renta
+En tus reportes puedes ver la rentabilidad real de cada renta
