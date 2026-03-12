@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
+import { AddressAutocomplete } from "../common/AddressAutocomplete";
 
 const initialDataForm = {
   id: 0,
@@ -12,7 +13,7 @@ const initialDataForm = {
 export const ClientForm = ({ handlerAdd, clientSelected, formId = "client-form" }) => {
 
   const [form, setForm] = useState(initialDataForm)
-  const { id, nombre, telefono, direccion, email } = form;
+  const { nombre, telefono, direccion, email } = form;
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -116,14 +117,12 @@ export const ClientForm = ({ handlerAdd, clientSelected, formId = "client-form" 
       {telefono && <small className="text-muted">{telefono.length}/10 dígitos</small>}
     </div>
 
-    <div>
-      <input
+    <div className="my-3">
+      <AddressAutocomplete
         placeholder="Dirección"
-        className={`form-control my-3 w-100 ${errors.direccion ? 'is-invalid' : ''}`}
-        name="direccion"
         value={direccion}
-        onChange={(event) => {
-          setForm({ ...form, direccion: event.target.value });
+        onChange={(val) => {
+          setForm({ ...form, direccion: val });
           if (errors.direccion) setErrors({ ...errors, direccion: null });
         }}
       />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { findAll as findAllClients } from "../../../services/clientService";
 import ClientSelector from "./ClientSelector";
+import { AddressAutocomplete } from "../../common/AddressAutocomplete";
 
 const StepClient = ({ rentalData, setRentalData, onNext, onBack }) => {
   const [clients, setClients] = useState([]);
@@ -72,12 +73,10 @@ const StepClient = ({ rentalData, setRentalData, onNext, onBack }) => {
             </button>
           )}
         </div>
-        <textarea
-          className="form-control"
-          rows="3"
-          placeholder="Dirección completa del evento"
+        <AddressAutocomplete
+          placeholder="Buscar dirección de entrega..."
           value={address}
-          onChange={(e) => setAddress(e.target.value)}
+          onChange={setAddress}
         />
       </div>
 
