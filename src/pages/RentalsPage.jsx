@@ -14,6 +14,7 @@ export const RentalsPage = () => {
   const [viewMode, setViewMode] = useState("cards");
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [rentalToEdit, setRentalToEdit] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true);
 
   // Estado para controlar el modal de pagos. 
@@ -43,6 +44,40 @@ export const RentalsPage = () => {
   useEffect(() => {
     getRentals();
   }, []);
+
+  const filteredRentals = Array.isArray(rentals) ? rentals.filter(rental => {
+    const search = searchTerm.toLowerCase()
+
+    // Campos directos
+    const matchAddress = rental.address?.toLowerCase().includes(search);
+    const matchStatus = rental.status?.toLowerCase().includes(search);
+    const matchTotal = rental.total?.toString().includes(search);
+
+    // Campos del cliente (objeto anidado)
+    const matchClientName = rental.client?.name?.toLowerCase().includes(search);
+    const matchClientPhone = rental.client?.phone?.includes(search);
+
+    // Usuario
+    const matchUsername = rental.user?.username?.toLowerCase().includes(search);
+
+    // Items (array) - busca si AL MENOS UN item coincide
+    const matchItems = rental.items?.some(item =>
+      item.productName?.toLowerCase().includes(search) ||
+      item.quantity?.toString().includes(search) ||
+      item.unitPrice?.toString().includes(search)
+    );
+
+    return (
+      matchAddress ||
+      matchStatus ||
+      matchTotal ||
+      matchClientName ||
+      matchClientPhone ||
+      matchUsername ||
+      matchItems
+    );
+  })
+    : []
 
   const handlerOpenWizard = () => {
     setRentalToEdit(null);
@@ -86,6 +121,7 @@ export const RentalsPage = () => {
         Swal.fire('Eliminada', 'La renta ha sido eliminada', 'success');
         getRentals();
       } catch (error) {
+        console.error(error)
         Swal.fire('Error', 'No se pudo eliminar la renta', 'error');
       }
     }
@@ -133,6 +169,7 @@ export const RentalsPage = () => {
       Swal.fire('Actualizado', 'El estado fue actualizado correctamente', 'success');
       getRentals(); // refresca lista
     } catch (error) {
+      console.error(error)
       Swal.fire('Error', 'No se pudo cambiar el estado', 'error');
     }
   };
@@ -197,6 +234,8 @@ export const RentalsPage = () => {
             type="text"
             className="form-control"
             placeholder="Buscar por cliente, fecha, dirección o estado..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
@@ -214,7 +253,7 @@ export const RentalsPage = () => {
         </div>
       ) : viewMode === "table" ? (
         <RentalTable
-          rentals={rentals}
+          rentals={filteredRentals}
           onView={handlerViewRental}
           onEdit={handlerEditRental}
           onDelete={handlerDeleteRental}
@@ -232,7 +271,7 @@ export const RentalsPage = () => {
               No hay rentas registradas
             </div>
           ) : (
-            rentals.map((rental) => (
+            filteredRentals.map((rental) => (
               <RentalCard
                 key={rental.id}
                 rental={rental}

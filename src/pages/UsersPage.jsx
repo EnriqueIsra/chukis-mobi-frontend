@@ -10,6 +10,9 @@ import { ModuleHeader } from "../components/common/ModuleHeader";
 export const UsersPage = () => {
 
     const [users, setUsers] = useState([])
+    
+    // Para buscar
+    const [searchTerm, setSearchTerm] = useState("")
     const [userSelected, setUserSelected] = useState({
         id: 0,
         username: '',
@@ -29,6 +32,18 @@ export const UsersPage = () => {
         getUsers()
         findAllUsers().then(res => setUsers(res.data));
     }, [])
+
+    // Función de filtrado de usuarios por rol, nombre o teléfono
+    const filteredUsers = Array.isArray(users) ? users.filter(user => {
+        const search = searchTerm.toLowerCase()
+
+        return (
+            user.username?.toLowerCase().includes(search) ||
+            user.telefono?.toLowerCase().includes(search) ||
+            user.role?.toLowerCase().includes(search)
+        )
+    })
+        : [] 
 
     const handlerAddUser = async (user) => {
         if (user.id > 0) {
@@ -124,6 +139,8 @@ export const UsersPage = () => {
                         type="text"
                         className="form-control"
                         placeholder="Buscar por nombre de usuario, teléfono o rol..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
 
@@ -138,7 +155,7 @@ export const UsersPage = () => {
                     <div className="col-12">
                         {users.length > 0 ? (
                             <UserTable
-                                users={users}
+                                users={filteredUsers}
                                 handlerUserSelected={handlerUserSelected}
                                 handlerRemoveUser={handlerRemoveUser}
                             />
@@ -152,7 +169,7 @@ export const UsersPage = () => {
             ) : (
                 <div className="row">
                     {users.length > 0 ? (
-                        users.map(user => (
+                        filteredUsers.map(user => (
                             <UserCard
                                 key={user.id}
                                 user={user}

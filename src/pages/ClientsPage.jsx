@@ -10,6 +10,10 @@ import { ModuleHeader } from "../components/common/ModuleHeader";
 export const ClientsPage = () => {
 
     const [clients, setClients] = useState([])
+
+    // Guarda el texto que el usuario escribe en el buscador
+    // Es un useStatew con string vacío. Cada vez que el usuario escriba algo en el input, este estado se actualiza y React re-renderiza con los resultados filtrados.
+    const [searchTerm, setSearchTerm] = useState("")
     const [clientSelected, setClientSelected] = useState({
         id: 0,
         nombre: '',
@@ -19,6 +23,7 @@ export const ClientsPage = () => {
     })
     const [viewMode, setViewMode] = useState("cards");
     const [isModalOpen, setIsModalOpen] = useState(false);
+
 
     const getClients = async () => {
         const result = await findAll()
@@ -30,6 +35,23 @@ export const ClientsPage = () => {
     useEffect(() => {
         getClients()
     }, [])
+
+    // Filtrado de clientes (frontend) se filtra por: Nombre, Teléfono, Dirección y Email.
+    // Convierte todo a minúsculas para que la búsqueda no sea sensible a maypusculas.
+    // Si searchTerm está vacío, .includes("") siempre es true -> se muestran todos
+    const filteredClients = Array.isArray(clients) ? clients.filter(client => {
+        const search = searchTerm.toLowerCase()
+
+        return (
+            client.nombre?.toLowerCase().includes(search) ||
+            client.telefono?.toLowerCase().includes(search) ||
+            client.direccion?.toLowerCase().includes(search) ||
+            client.email?.toLowerCase().includes(search)
+        )
+        /* Explicación:
+        Array.isArray(clients) -> verifica que clients sea un arreglo (por seguridad) .filter() -> recorre cada cliente y solo deja pasar los que coincidan searchTerm.toLowerCase() -> convierte la búsqueda a minpusculas client.nombre?.toLowerCase().includes(search) -> el ?. es optional chaining, si el nombre es null/undefined no truena, simplemente retorna false Se busca en los 4 campos con || (OR) -> si coincide en CUALQUIER campo, se incluye */
+    })
+        : []
 
     const handlerAddClient = async (client) => {
         console.log('handlerAddClient received:', client);
@@ -128,6 +150,9 @@ export const ClientsPage = () => {
                         type="text"
                         className="form-control"
                         placeholder="Buscar por nombre, teléfono, dirección o email..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        /* value={searchTerm} -> el input siempre muestra lo que hay en el estado (input controlado) onChange={(e) => setSearchTerm(e.target.value)} -> cada tecla que escribe el usuario actualiza el estado -> React re-renderiza -> filteredClients se recalcula automáticamente */
                     />
                 </div>
 
@@ -143,7 +168,7 @@ export const ClientsPage = () => {
                     <div className="col-12">
                         {clients.length > 0 ? (
                             <ClientTable
-                                clients={clients}
+                                clients={filteredClients}
                                 handlerClientSelected={handlerClientSelected}
                                 handlerRemoveClient={handlerRemoveClient}
                             />
@@ -157,7 +182,7 @@ export const ClientsPage = () => {
             ) : (
                 <div className="row">
                     {clients.length > 0 ? (
-                        clients.map(client => (
+                        filteredClients.map(client => (
                             <ClientCard
                                 key={client.id}
                                 client={client}
