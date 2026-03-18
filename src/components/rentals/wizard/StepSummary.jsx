@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 const StepSummary = ({ rentalData, onBack, onFinish, isEditMode }) => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isEditingTotal, setIsEditingTotal] = useState(false)
+  const [customTotal, setCustomTotal] = useState(null)  // null = usa el total calculado
 
   useEffect(() => {
     const sum = rentalData.items.reduce(
@@ -24,6 +26,7 @@ const StepSummary = ({ rentalData, onBack, onFinish, isEditMode }) => {
         clientId: Number(rentalData.clientId),
         userId: Number(rentalData.userId),
         address: rentalData.address,
+        total: customTotal ?? total,
         items: rentalData.items.map(item => ({
           productId: Number(item.productId),
           quantity: Number(item.quantity)
@@ -31,6 +34,11 @@ const StepSummary = ({ rentalData, onBack, onFinish, isEditMode }) => {
       };
 
       console.log(isEditMode ? "Actualizando renta:" : "Enviando renta:", requestData);
+
+      // Agrega esto justo antes del if (isEditMode)
+      console.log("Total enviado:", requestData.total)
+      console.log("customTotal:", customTotal)
+      console.log("total calculado:", total)
 
       if (isEditMode) {
         await updateRental(rentalData.id, requestData);
@@ -112,8 +120,65 @@ const StepSummary = ({ rentalData, onBack, onFinish, isEditMode }) => {
             </tbody>
           </table>
 
-          <div className="text-end fw-bold fs-5">
-            Total: ${total}
+          <div className="text-end fw-bold fs-5 d-flex justify-content-end align-items-center gap-2">
+            <span>Total:</span>
+
+            {isEditingTotal ? (
+              // Modo edición - input numérico
+              <div className="d-flex align-items-center gap-2">
+                <span>$</span>
+                <input
+                  type="number"
+                  className="form-control form-control-sm"
+                  style={{ width: "120px" }}
+                  value={customTotal ?? total}
+                  min={0}
+                  onChange={(e) => setCustomTotal(Number(e.target.value))}
+                  autoFocus
+                />
+                {/* Confirmar el valor editado */}
+                <button
+                  className="btn btn-success btn-sm"
+                  onClick={() => setIsEditingTotal(false)}
+                >
+                  <i className="bi bi-check-lg" />
+                </button>
+                {/* Cancelar y volver al total calculado */}
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => {
+                    setCustomTotal(null)
+                    setIsEditingTotal(false)
+                  }}
+                >
+                  <i className="bi bi-x-lg" />
+                </button>
+              </div>
+            ) : (
+              // Modo lectura - muestra el total con el botón de editar 
+              <div className="d-flex align-items-center gap-2">
+                <span className={customTotal !== null ? "text-warning" : ""}>
+                  ${customTotal ?? total}
+                </span>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  title="Modificar total"
+                  onClick={() => setIsEditingTotal(true)}
+                >
+                  <i className="bi bi-pencil" />
+                </button>
+                {/* Botón para restablecer al total calculado si fue modificado */}
+                {customTotal !== null && (
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    title="Restablecer total original"
+                    onClick={() => setCustomTotal(null)}
+                  >
+                    <i className="bi bi-arrow-counterclockwise" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
