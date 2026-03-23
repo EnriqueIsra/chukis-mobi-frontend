@@ -1,66 +1,61 @@
-.product-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-  cursor: pointer;
+.expense-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+    cursor: pointer;
 }
 
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+.expense-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 .card-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 8px;
-  opacity: 0;
-  z-index: 10;
-  transition: opacity 0.3s ease-in-out;
-  pointer-events: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    z-index: 10;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
 }
 
-.product-card:hover .card-actions {
-  opacity: 1;
-  pointer-events: auto;
+.expense-card:hover .card-actions {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .card-actions button {
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.2s ease;
-  backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
 .card-actions button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.card-actions button.btn-danger {
-  background-color: rgba(220, 53, 69, 0.95) !important;
-  color: white;
-  border: none;
+.expense-card .card-actions .btn-outline-warning:hover {
+    background-color: #ffc107 !important;
+    color: #000 !important;
 }
 
-.card-actions button.btn-danger:hover {
-  background-color: rgba(200, 35, 51, 0.95) !important;
+.expense-card .card-actions .btn-outline-danger:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
 }
 
-.card-actions button.btn-light {
-  color: #333;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.card-actions button.btn-light:hover {
-  background-color: rgba(248, 249, 250, 1) !important;
-  color: #0d6efd;
+.expense-card .card-actions .btn-outline-success:hover {
+    background-color: #198754 !important;
+    color: white !important;
 }

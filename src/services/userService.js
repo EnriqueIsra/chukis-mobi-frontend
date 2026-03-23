@@ -38,10 +38,30 @@ export const updateUser = async ({ id, username, telefono, role, password, image
   }
   return undefined;
 };
-export const removeUser = async (id) => {
+export const findInactiveUsers = async () => {
   try {
-    await axiosInstance.delete(`/users/${id}`);
+    const response = await axiosInstance.get("/users/inactive");
+    return response;
   } catch (error) {
     console.log(error);
   }
+  return null;
+};
+
+export const deactivateUser = async (id, reason, userId) => {
+  try {
+    return await axiosInstance.patch(`/users/${id}/deactivate`, { reason, userId });
+  } catch (error) {
+    console.log(error);
+  }
+  return undefined;
+};
+
+export const activateUser = async (id) => {
+  try {
+    return await axiosInstance.patch(`/users/${id}/activate`);
+  } catch (error) {
+    console.log(error);
+  }
+  return undefined;
 };

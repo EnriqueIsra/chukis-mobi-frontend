@@ -32,7 +32,7 @@ const RentalTable = ({
  }) => {
   return (
     <table className="table table-bordered table-hover">
-      <thead className="table-light">
+      <thead className="table-dark">
         <tr>
           <th>#</th>
           <th>Cliente</th>

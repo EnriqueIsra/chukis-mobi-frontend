@@ -38,10 +38,30 @@ export const update = async ({ id, nombre, telefono, direccion, email }) => {
   return null;
 };
 
-export const remove = async (id) => {
+export const findInactive = async () => {
   try {
-    await axiosInstance.delete(`/clients/${id}`);
+    const response = await axiosInstance.get("/clients/inactive");
+    return response;
   } catch (error) {
     console.error(error);
   }
+  return null;
+};
+
+export const deactivate = async (id, reason, userId) => {
+  try {
+    return await axiosInstance.patch(`/clients/${id}/deactivate`, { reason, userId });
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
+};
+
+export const activate = async (id) => {
+  try {
+    return await axiosInstance.patch(`/clients/${id}/activate`);
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
 };

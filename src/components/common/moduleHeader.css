@@ -257,6 +257,33 @@
     color: rgba(255, 255, 255, 0.7);
 }
 
+/* btn-group: botón NO seleccionado (apagado) */
+.module-header .btn-group .btn-outline-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.4);
+    animation: none;
+}
+
+/* btn-group: botón seleccionado (encendido con glow cyan) */
+.module-header .btn-group .btn-outline-secondary.active {
+    background: rgba(0, 207, 255, 0.2);
+    border-color: rgba(0, 207, 255, 0.6);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0, 207, 255, 0.5), 0 0 24px rgba(139, 92, 246, 0.2);
+    animation: btn-glow-pulse 3s ease-in-out infinite;
+}
+
+/* btn-group: hover del botón NO seleccionado */
+.module-header .btn-group .btn-outline-secondary:not(.active):hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+    box-shadow: none;
+    transform: none;
+    animation: none;
+}
+
 /* 
     Input de búsqueda oscuro
     ----------------------------------
@@ -288,6 +315,43 @@
     background: rgba(255, 255, 255, 0.15);
     border-color: #00cfff;
     box-shadow: 0 0 8px rgba(0, 207, 255, 0.3);
+    color: #fff;
+}
+
+/*
+    Select oscuro (form-select) dentro del header
+    ----------------------------------
+    Misma idea que los botones y el form-control:
+    fondo semi-transparente oscuro para integrarse con el header
+*/
+.module-header .form-select {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    animation: btn-glow-pulse 3s ease-in-out infinite;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.module-header .form-select:hover {
+    background-color: rgba(0, 207, 255, 0.2);
+    border-color: rgba(0, 207, 255, 0.6);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(0, 207, 255, 0.6), 0 0 40px rgba(139, 92, 246, 0.3);
+    transform: scale(1.05);
+    animation: none;
+}
+
+.module-header .form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: #00cfff;
+    box-shadow: 0 0 8px rgba(0, 207, 255, 0.3);
+    color: #fff;
+}
+
+.module-header .form-select option {
+    background-color: #1a1a2e;
     color: #fff;
 }
 

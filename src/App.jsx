@@ -9,6 +9,10 @@ import { ClientsPage } from "./pages/ClientsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { RentalsPage } from "./pages/RentalsPage";
 import { CalendarPage } from "./pages/CalendarPage";
+import { ProvidersPage } from "./pages/ProvidersPage";
+import { RentalExternalItemsPage } from "./pages/RentalExternalItemsPage";
+import { ExpensesPage } from "./pages/ExpensesPage";
+import { NominaPage } from "./pages/NominaPage";
 
 // Función para verificar si token JWT está expirado
 // Un token JWT tiene 3 partes separadas por puntos:
@@ -25,15 +29,14 @@ import { CalendarPage } from "./pages/CalendarPage";
 // Si no se puede decodificar -> asumimos expirado -> return true
 const isTokenExpired = (token) => {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.exp * 1000 < Date.now()
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
   } catch {
-    return true
+    return true;
   }
-}
+};
 
 export const App = () => {
-
   // Al iniciar el estado, ahora verificamos si el token está expirado
   // Si hay un usuario en localStorage PERO su token ya expiró
   //    - Limpiamos localStorage
@@ -45,12 +48,12 @@ export const App = () => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      const parsed = JSON.parse(storedUser)
+      const parsed = JSON.parse(storedUser);
       if (parsed.token && isTokenExpired(parsed.token)) {
-        localStorage.removeItem("user")
-        return null        
+        localStorage.removeItem("user");
+        return null;
       }
-      return parsed
+      return parsed;
     }
     return null;
   });
@@ -68,21 +71,20 @@ export const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-
         <Route
           path="/login"
           element={
-            user
-              ? <Navigate to="/" />
-              : <LoginPage onLogin={handleLogin} />
+            user ? <Navigate to="/" /> : <LoginPage onLogin={handleLogin} />
           }
         />
 
         <Route
           element={
-            user
-              ? <MainLayout user={user} onLogout={handleLogout} />
-              : <Navigate to="/login" />
+            user ? (
+              <MainLayout user={user} onLogout={handleLogout} />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         >
           <Route path="/" element={<DashboardPage />} />
@@ -91,9 +93,11 @@ export const App = () => {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/rentals" element={<RentalsPage />} />
           <Route path="/calendar" element={<CalendarPage />} />
-
+          <Route path="/providers" element={<ProvidersPage />} />
+          <Route path="/rental-external-items" element={<RentalExternalItemsPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/nomina" element={<NominaPage />} />
         </Route>
-
       </Routes>
     </BrowserRouter>
   );

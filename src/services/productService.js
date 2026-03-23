@@ -39,12 +39,32 @@ export const update = async ({ id, name, description, price, color, stock, image
   }
   return undefined;
 };
-export const remove = async (id) => {
+export const findInactive = async () => {
   try {
-    await axiosInstance.delete(`/products/${id}`);
+    const response = await axiosInstance.get("/products/inactive");
+    return response;
   } catch (error) {
     console.log(error);
   }
+  return null;
+};
+
+export const deactivate = async (id, reason, userId) => {
+  try {
+    return await axiosInstance.patch(`/products/${id}/deactivate`, { reason, userId });
+  } catch (error) {
+    console.log(error);
+  }
+  return undefined;
+};
+
+export const activate = async (id) => {
+  try {
+    return await axiosInstance.patch(`/products/${id}/activate`);
+  } catch (error) {
+    console.log(error);
+  }
+  return undefined;
 };
 
 // Obtener disponibilidad de productos por fechas

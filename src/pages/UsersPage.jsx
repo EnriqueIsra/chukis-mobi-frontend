@@ -4,126 +4,88 @@ import { UsersToolbar } from "../components/users/UsersToolbar";
 import { UserCard } from "../components/users/UserCard";
 import { UserModal } from "../components/users/UserModal";
 import Swal from "sweetalert2";
-import { createUser, findAllUsers, removeUser, updateUser } from "../services/userService";
+import { findAllUsers, findInactiveUsers, createUser, updateUser, deactivateUser, activateUser } from "../services/userService";
 import { ModuleHeader } from "../components/common/ModuleHeader";
 
 export const UsersPage = () => {
 
-    const [users, setUsers] = useState([])
-    
-    // Para buscar
-    const [searchTerm, setSearchTerm] = useState("")
+    const currentUser = JSON.parse(localStorage.getItem("user"));
+    const [users, setUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [userSelected, setUserSelected] = useState({
-        id: 0,
-        username: '',
-        role: '',
-        password: '',
-        imageUrl: '',
-    })
+        id: 0, username: '', role: '', password: '', imageUrl: ''
+    });
     const [viewMode, setViewMode] = useState("cards");
+    const [showInactive, setShowInactive] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const getUsers = async () => {
-        const result = await findAllUsers()
-        setUsers(result.data)
-    }
+    const loadUsers = async () => {
+        const result = showInactive ? await findInactiveUsers() : await findAllUsers();
+        if (result?.data) {
+            setUsers(result.data);
+        }
+    };
 
     useEffect(() => {
-        getUsers()
-        findAllUsers().then(res => setUsers(res.data));
-    }, [])
+        loadUsers();
+    }, [showInactive]);
 
-    // Función de filtrado de usuarios por rol, nombre o teléfono
     const filteredUsers = Array.isArray(users) ? users.filter(user => {
-        const search = searchTerm.toLowerCase()
-
+        const search = searchTerm.toLowerCase();
         return (
             user.username?.toLowerCase().includes(search) ||
             user.telefono?.toLowerCase().includes(search) ||
             user.role?.toLowerCase().includes(search)
-        )
-    })
-        : [] 
+        );
+    }) : [];
 
     const handlerAddUser = async (user) => {
         if (user.id > 0) {
-            const response = await updateUser(user)
-            setUsers(
-                users.map(u => {
-                    if (u.id == user.id) {
-                        return { ...response.data };
-                    }
-                    return u
-                })
-            )
+            await updateUser(user);
             Swal.fire({
-                title: "actualizado con éxito",
+                title: "Actualizado con éxito",
                 text: `Usuario ${user.username} actualizado con éxito`,
                 icon: "success"
             });
         } else {
-            const response = await createUser(user);
-            setUsers([...users, { ...response.data }]);
+            await createUser(user);
             Swal.fire({
                 title: "Creado con éxito",
                 text: `Usuario ${user.username} creado con éxito`,
                 icon: "success"
             });
         }
-    }
+        loadUsers();
+    };
 
     const handlerUserSelected = (user) => {
-        setUserSelected({ ...user })
-        setIsModalOpen(true)
-    }
+        setUserSelected({ ...user });
+        setIsModalOpen(true);
+    };
 
     const handlerOpenModal = () => {
         setUserSelected({
-            id: 0,
-            username: '',
-            role: '',
-            password: '',
-            imageUrl: '',
-        })
-        setIsModalOpen(true)
-    }
+            id: 0, username: '', role: '', password: '', imageUrl: ''
+        });
+        setIsModalOpen(true);
+    };
 
     const handlerCloseModal = () => {
-        setIsModalOpen(false)
+        setIsModalOpen(false);
         setUserSelected({
-            id: 0,
-            username: '',
-            role: '',
-            password: '',
-            imageUrl: '',
-        })
-    }
-
-    const handlerRemoveUser = (id) => {
-
-        Swal.fire({
-            title: "¿Está seguro de eliminar el usuario?",
-            text: "Esta acción no se puede revertir",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "¡Continuar!",
-            cancelButtonText: "Cancelar"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                removeUser(id)
-                setUsers(
-                    users.filter(user => user.id != id)
-                )
-                Swal.fire({
-                    title: "¡Eliminado!",
-                    text: "El usuario ha sido eliminado con éxito",
-                    icon: "success"
-                });
-            }
+            id: 0, username: '', role: '', password: '', imageUrl: ''
         });
-    }
+    };
+
+    const handleDeactivate = async (id, reason) => {
+        await deactivateUser(id, reason, currentUser.id);
+        loadUsers();
+    };
+
+    const handleActivate = async (id) => {
+        await activateUser(id);
+        loadUsers();
+    };
 
     return (
         <>
@@ -147,42 +109,47 @@ export const UsersPage = () => {
                 <div className="col-12 col-lg-auto">
                     <UsersToolbar viewMode={viewMode} setViewMode={setViewMode} />
                 </div>
-            </ModuleHeader>
 
-
-            {viewMode === "table" ? (
-                <div className="row">
-                    <div className="col-12">
-                        {users.length > 0 ? (
-                            <UserTable
-                                users={filteredUsers}
-                                handlerUserSelected={handlerUserSelected}
-                                handlerRemoveUser={handlerRemoveUser}
-                            />
-                        ) : (
-                            <div className="alert alert-warning">
-                                No hay usuarios
-                            </div>
-                        )}
+                <div className="col-12 col-lg-auto">
+                    <div className="btn-group">
+                        <button
+                            className={`btn btn-outline-secondary ${!showInactive ? "active" : ""}`}
+                            onClick={() => setShowInactive(false)}
+                        >
+                            <i className="bi bi-eye me-1"></i>Activos
+                        </button>
+                        <button
+                            className={`btn btn-outline-secondary ${showInactive ? "active" : ""}`}
+                            onClick={() => setShowInactive(true)}
+                        >
+                            <i className="bi bi-eye-slash me-1"></i>Inactivos
+                        </button>
                     </div>
                 </div>
+            </ModuleHeader>
+
+            {viewMode === "table" ? (
+                <UserTable
+                    users={filteredUsers}
+                    onEdit={handlerUserSelected}
+                    onDeactivate={handleDeactivate}
+                    onActivate={handleActivate}
+                    showInactive={showInactive}
+                />
             ) : (
                 <div className="row">
-                    {users.length > 0 ? (
+                    {filteredUsers.length > 0 ? (
                         filteredUsers.map(user => (
                             <UserCard
                                 key={user.id}
                                 user={user}
                                 onEdit={handlerUserSelected}
-                                onRemove={handlerRemoveUser}
+                                onDeactivate={handleDeactivate}
+                                onActivate={handleActivate}
                             />
                         ))
                     ) : (
-                        <div className="col-12">
-                            <div className="alert alert-warning">
-                                No hay usuarios
-                            </div>
-                        </div>
+                        <p className="text-muted">No hay usuarios</p>
                     )}
                 </div>
             )}

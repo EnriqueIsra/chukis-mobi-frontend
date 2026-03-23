@@ -91,10 +91,11 @@ export const ExpenseForm = ({ handlerAdd, expenseSelected, formId = "expense-for
 
             <div>
                 <input
-                    type="datetime-local"
+                    type="date"
+                    placeholder="Fecha"
                     className="form-control my-3 w-100"
                     name="expenseDate"
-                    value={expenseDate}
+                    value={expenseDate ? expenseDate.substring(0, 10) : ""}
                     onChange={(e) => setForm({ ...form, expenseDate: e.target.value })}
                 />
             </div>

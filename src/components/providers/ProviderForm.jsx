@@ -26,8 +26,8 @@ export const ProviderForm = ({ handlerAdd, providerSelected, formId = "provider-
             id={formId}
             onSubmit={(event) => {
                 event.preventDefault();
-                if (!name || phone) {
-                    alert('Debe completar el nombre y el teléfono')
+                if (!name) {
+                    alert('El nombre es obligatorio')
                     return;
                 }
                 handlerAdd(form);

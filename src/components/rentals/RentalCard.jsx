@@ -67,7 +67,7 @@ export const RentalCard = ({
         {/* Hover actions */}
         <div className="card-actions">
           <button
-            className="btn btn-sm btn-light"
+            className="btn btn-sm btn-outline-primary"
             onClick={handleView}
             title="Ver detalles"
           >
@@ -75,7 +75,7 @@ export const RentalCard = ({
           </button>
           {rental.status === 'CREATED' || rental.status === 'DELIVERED' && (
             <button
-              className="btn btn-sm btn-secondary"
+              className="btn btn-sm btn-outline-secondary"
               onClick={(e) => {
                 e.stopPropagation();
                 onChangeStatus(rental);
@@ -92,7 +92,7 @@ export const RentalCard = ({
           - No tiene sentido registrar pagos de rentas canceladas */}
           {rental.status !== 'CANCELLED' && (
             <button
-              className='btn btn-sm btn-success'
+              className='btn btn-sm btn-outline-success'
               onClick={handlePayment}
               title='Registrar pago'
             >
@@ -111,16 +111,16 @@ export const RentalCard = ({
             <i className="bi bi-x-circle"></i>
           </button>
           <button
-            className="btn btn-sm btn-warning"
+            className="btn btn-sm btn-outline-warning"
             onClick={handleEdit}
             title="Editar"
           >
             <i className="bi bi-pencil"></i>
           </button>
           <button
-            className="btn btn-sm btn-danger"
+            className="btn btn-sm btn-outline-danger"
             onClick={handleDelete}
-            title="Eliminar"
+            title="Desactivar"
           >
             <i className="bi bi-trash"></i>
           </button>

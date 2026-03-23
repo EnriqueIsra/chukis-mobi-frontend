@@ -1,22 +1,17 @@
 export const RentalsToolbar = ({ viewMode, setViewMode }) => {
   return (
-    <div className="d-flex gap-2 w-100">
+    <div className="btn-group">
       <button
-        className={`btn flex-grow-1 ${
-          viewMode === "table" ? "btn-primary" : "btn-outline-primary"
-        }`}
-        onClick={() => setViewMode("table")}
-      >
-        <i className="bi bi-table"></i> Ver Tabla
-      </button>
-
-      <button
-        className={`btn flex-grow-1 ${
-          viewMode === "cards" ? "btn-primary" : "btn-outline-primary"
-        }`}
+        className={`btn btn-outline-secondary ${viewMode === "cards" ? "active" : ""}`}
         onClick={() => setViewMode("cards")}
       >
-        <i className="bi bi-grid-3x3-gap"></i> Ver Cuadrícula
+        <i className="bi bi-grid me-1"></i>Cards
+      </button>
+      <button
+        className={`btn btn-outline-secondary ${viewMode === "table" ? "active" : ""}`}
+        onClick={() => setViewMode("table")}
+      >
+        <i className="bi bi-list-ul me-1"></i>Tabla
       </button>
     </div>
   );

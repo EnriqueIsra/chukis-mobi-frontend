@@ -21,14 +21,15 @@ export const findInactive = async () => {
     return null;
 }
 
-export const create = async ( { amount, expenseDate, category, description, imageUrl } ) => {
+export const create = async ( { amount, expenseDate, category, description, imageUrl, userId } ) => {
     try {
         return await axiosInstance.post("/expenses", {
             amount,
             expenseDate,
             category,
             description,
-            imageUrl
+            imageUrl,
+            userId
         });
     } catch (error) {
         console.error(error);

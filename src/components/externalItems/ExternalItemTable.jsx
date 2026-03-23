@@ -1,11 +1,11 @@
 import PropTypes from "prop-types";
 import Swal from "sweetalert2"
 
-export const ProviderTable = ({ providers, onEdit, onDeactivate, onActivate, showInactive }) => {
+export const ExternalItemTable = ({ items, onEdit, onDeactivate, onActivate, showInactive }) => {
 
-  const handleDeactivate = async (provider) => {
+  const handleDeactivate = async (item) => {
     const result = await Swal.fire({
-      title: "¿Desactivar proveedor?",
+      title: "¿Desactivar ítem?",
       input: "textarea",
       inputLabel: "Motivo de desactivación",
       inputPlaceholder: "Escribe el motivo...",
@@ -18,7 +18,7 @@ export const ProviderTable = ({ providers, onEdit, onDeactivate, onActivate, sho
       confirmButtonColor: "#d33"
     })
     if (result.isConfirmed) {
-      onDeactivate(provider.id, result.value)
+      onDeactivate(item.id, result.value)
     }
   }
 
@@ -27,33 +27,40 @@ export const ProviderTable = ({ providers, onEdit, onDeactivate, onActivate, sho
       <table className="table table-bordered table-hover">
         <thead className="table-dark">
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Teléfono</th>
+            <th>Renta</th>
+            <th>Proveedor</th>
+            <th>Descripción</th>
+            <th>Cantidad</th>
+            <th>Costo unitario</th>
+            <th>Total</th>
             <th>Notas</th>
             {showInactive && <th>Motivo desactivación</th>}
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {providers.map((provider) => (
-            <tr key={provider.id} className={!provider.active ? "table-secondary" : ""}>
-              <td>{provider.id}</td>
-              <td>{provider.name}</td>
-              <td>{provider.phone}</td>
-              <td>{provider.notes || "-"}</td>
-              {showInactive && <td>{provider.desactivationReason || "-"}</td>}
+          {items.map((item) => (
+            <tr key={item.id} className={!item.active ? "table-secondary" : ""}>
+              <td>{item.rentalId}</td>
+              <td>{item.providerName}</td>
+              <td>{item.description}</td>
+              <td>{item.quantity}</td>
+              <td>{item.unitCost.toLocaleString()}</td>
+              <td>{item.totalCost.toLocaleString()}</td>
+              <td>{item.notes || "-"}</td>
+              {showInactive && <td>{item.desactivationReason || "-"}</td>}
               <td>
-                {provider.active ? (
+                <div className="d-flex gap-1 flex-wrap">
+                {item.active ? (
                   <>
-                    <button className="btn btn-sm btn-outline-primary me-2"
-                      onClick={() => onEdit(provider)}
+                    <button className="btn btn-sm btn-outline-primary"
+                      onClick={() => onEdit(item)}
                     >
                       <i className="bi bi-pencil"></i>
                       <span className="d-none d-md-inline"> Editar</span>
                     </button>
                     <button className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDeactivate(provider)}
+                      onClick={() => handleDeactivate(item)}
                     >
                       <i className="bi bi-trash"></i>
                       <span className="d-none d-md-inline"> Desactivar</span>
@@ -64,27 +71,28 @@ export const ProviderTable = ({ providers, onEdit, onDeactivate, onActivate, sho
                     title="Reactivar"
                     onClick={async () => {
                       const r = await Swal.fire({
-                        title: "¿Reactivar proveedor?",
+                        title: "¿Reactivar ítem?",
                         icon: "question",
                         showCancelButton: true,
                         confirmButtonText: "Reactivar",
                         cancelButtonText: "Cancelar",
                         confirmButtonColor: "#198754"
                       });
-                      if (r.isConfirmed) onActivate(provider.id);
+                      if (r.isConfirmed) onActivate(item.id);
                     }}
                   >
                     <i className="bi bi-arrow-counterclockwise"></i>
                     <span className="d-none d-md-inline"> Reactivar</span>
                   </button>
                 )}
+                </div>
               </td>
             </tr>
           ))} 
-          { providers.length === 0 && (
+          { items.length === 0 && (
             <tr>
-              <td colSpan="5" className="text-center text-muted py-4">
-                No hay proveedores registrados
+              <td colSpan="9" className="text-center text-muted py-4">
+                No hay ítems registrados
               </td>
             </tr>
           )}
@@ -93,8 +101,8 @@ export const ProviderTable = ({ providers, onEdit, onDeactivate, onActivate, sho
     </div>
   );
 };
-ProviderTable.propTypes = {
-  providers: PropTypes.array.isRequired,
+ExternalItemTable.propTypes = {
+  items: PropTypes.array.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDeactivate: PropTypes.func.isRequired,
   onActivate: PropTypes.func.isRequired,

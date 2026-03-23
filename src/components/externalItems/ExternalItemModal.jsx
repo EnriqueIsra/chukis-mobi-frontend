@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
-import { ProviderForm } from "./ProviderForm";
+import { ExternalItemForm } from "./ExternalItemForm";
 
-export const ProviderModal = ({ isOpen, onClose, handlerAdd, providerSelected }) => {
+export const ExternalItemModal = ({ isOpen, onClose, handlerAdd, itemSelected, providers }) => {
   if (!isOpen) return null;
 
   return (
@@ -23,7 +23,7 @@ export const ProviderModal = ({ isOpen, onClose, handlerAdd, providerSelected })
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">
-                {providerSelected.id > 0 ? 'Editar Proveedor' : 'Registrar Proveedor'}
+                {itemSelected.id > 0 ? 'Editar Ítem' : 'Registrar Ítem Externo'}
               </h5>
               <button
                 type="button"
@@ -33,13 +33,14 @@ export const ProviderModal = ({ isOpen, onClose, handlerAdd, providerSelected })
               ></button>
             </div>
             <div className="modal-body">
-              <ProviderForm
-                formId="provider-modal-form"
-                handlerAdd={(provider) => {
-                  handlerAdd(provider);
+              <ExternalItemForm
+                formId="external-item-modal-form"
+                handlerAdd={(item) => {
+                  handlerAdd(item);
                   onClose();
                 }}
-                providerSelected={providerSelected}
+                itemSelected={itemSelected}
+                providers={providers}
               />
             </div>
             <div className="modal-footer">
@@ -52,10 +53,10 @@ export const ProviderModal = ({ isOpen, onClose, handlerAdd, providerSelected })
               </button>
               <button
                 type="submit"
-                form="provider-modal-form"
+                form="external-item-modal-form"
                 className="btn btn-primary"
               >
-                {providerSelected.id > 0 ? 'Actualizar' : 'Registrar'}
+                {itemSelected.id > 0 ? 'Actualizar' : 'Registrar'}
               </button>
             </div>
           </div>
@@ -65,9 +66,10 @@ export const ProviderModal = ({ isOpen, onClose, handlerAdd, providerSelected })
   );
 };
 
-ProviderModal.propTypes = {
+ExternalItemModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   handlerAdd: PropTypes.func.isRequired,
-  providerSelected: PropTypes.object.isRequired
+  itemSelected: PropTypes.object.isRequired,
+  providers: PropTypes.array.isRequired
 };

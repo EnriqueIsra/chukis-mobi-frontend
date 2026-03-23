@@ -73,9 +73,7 @@ export const ClientForm = ({ handlerAdd, clientSelected, formId = "client-form" 
         newErrors.telefono = 'El teléfono debe tener exactamente 10 dígitos';
       }
       if (!direccion) newErrors.direccion = 'La dirección es requerida';
-      if (!email) {
-        newErrors.email = 'El email es requerido';
-      } else if (!validateEmail(email)) {
+      if (email && !validateEmail(email)) {
         newErrors.email = 'Email inválido';
       }
 

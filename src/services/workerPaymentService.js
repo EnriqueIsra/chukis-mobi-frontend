@@ -43,6 +43,18 @@ export const getMonthlySummary = async (year, month) => {
     return null;
 }
 
+export const getMonthlySummaryInactive = async (year, month) => {
+    try {
+        const response = await axiosInstance.get("/worker-payments/monthly-summary/inactive", {
+            params: { year, month }
+        });
+        return response;
+    } catch (error) {
+        console.error(error);
+    }
+    return null;
+}
+
 export const create = async ( { workerId, amount, paymentDate, notes, registeredById } ) => {
     try {
         return await axiosInstance.post("/worker-payments", {
