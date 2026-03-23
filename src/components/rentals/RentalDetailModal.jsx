@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-// Importamos el servicio de pagos para cargar el historial y calcular cuánto se ha pagado de esta renta
+import Swal from "sweetalert2";
 import { getPaymentsByRentalId } from "../../services/paymentService";
 import "./rentalDetailModal.css"
 
@@ -36,7 +36,7 @@ const formatDateTime = (dateTimeStr) => {
     - onEdit:           función al dar clic en "Editar" (abre el wizard de edición)
     - onChangeStatus:   función al dar clic en "Estado" (muestra opciones de cambio)
     - onCancel:         función al dar clic en "Cancelar" (marca como CANCELLED)
-    - onDelete:         función al dar clic en "Eliminar" (elimina la renta)
+    - onDeactivate:         función al dar clic en "Eliminar" (elimina la renta)
     - onPayment:        función al dar clic en "Pagos" (abre PaymentModal)
 */
 const RentalDetailModal = ({
@@ -45,7 +45,7 @@ const RentalDetailModal = ({
     onEdit,
     onChangeStatus,
     onCancel,
-    onDelete,
+    onDeactivate,
     onPayment
 }) => {
     // Estado para los pagos de esta renta. Se cargan automáticamente al abrir el modal
@@ -160,7 +160,25 @@ const RentalDetailModal = ({
                                 {/* Eliminar - siempre visible */}
                                 <button
                                     className="btn btn-sm btn-danger"
-                                    onClick={() => { onClose(); onDelete(rental.id) }}
+                                    onClick={async () => {
+                                        const result = await Swal.fire({
+                                            title: "¿Desactivar renta?",
+                                            input: "textarea",
+                                            inputLabel: "Motivo de desactivación",
+                                            inputPlaceholder: "Escribe el motivo...",
+                                            inputValidator: (value) => {
+                                                if (!value) return "El motivo es obligatorio";
+                                            },
+                                            showCancelButton: true,
+                                            confirmButtonText: "Desactivar",
+                                            cancelButtonText: "Cancelar",
+                                            confirmButtonColor: "#d33"
+                                        });
+                                        if (result.isConfirmed) {
+                                            onClose();
+                                            onDeactivate(rental.id, result.value);
+                                        }
+                                    }}
                                     title="Eliminar"
                                 >
                                     <i className="bi bi-trash"></i>

@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 const statusConfig = {
   CREATED: { label: 'Creada', class: 'bg-info' },
   DELIVERED: { label: 'Entregada', class: 'bg-warning' },
@@ -5,7 +7,6 @@ const statusConfig = {
   CANCELLED: { label: 'Cancelada', class: 'bg-danger' }
 };
 
-// Formatear fecha y hora: "2024-01-15T10:00:00" -> "15/01/2024 10:00"
 const formatDateTime = (dateTimeStr) => {
   if (!dateTimeStr) return 'N/A';
   const date = new Date(dateTimeStr);
@@ -18,18 +19,37 @@ const formatDateTime = (dateTimeStr) => {
   });
 };
 
-// Agregamos onPayment a las props
-// Igual que en RentalCard, recibimos esta función
-// del padre (RentalsPage) para manejar la acción de pagos
-const RentalTable = ({ 
-  rentals, 
-  onView, 
-  onEdit, 
-  onDelete, 
-  onChangeStatus, 
+const RentalTable = ({
+  rentals,
+  onView,
+  onEdit,
+  onDeactivate,
+  onActivate,
+  onChangeStatus,
   onCancel,
-  onPayment // prop para manejar pagos
- }) => {
+  onPayment,
+  showInactive
+}) => {
+
+  const handleDeactivate = async (rental) => {
+    const result = await Swal.fire({
+      title: "¿Desactivar renta?",
+      input: "textarea",
+      inputLabel: "Motivo de desactivación",
+      inputPlaceholder: "Escribe el motivo...",
+      inputValidator: (value) => {
+        if (!value) return "El motivo es obligatorio";
+      },
+      showCancelButton: true,
+      confirmButtonText: "Desactivar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#d33"
+    });
+    if (result.isConfirmed) {
+      onDeactivate(rental.id, result.value);
+    }
+  };
+
   return (
     <table className="table table-bordered table-hover">
       <thead className="table-dark">
@@ -42,14 +62,14 @@ const RentalTable = ({
           <th>Total</th>
           <th>Estado</th>
           <th>Creado por</th>
-          {/* Aumentamos en ancho de la columna de acciones de 130 a 160 para que quepa el botón de pagos sin que se vea apretado */}
+          {showInactive && <th>Motivo desactivación</th>}
           <th width="160">Acciones</th>
         </tr>
       </thead>
       <tbody>
         {rentals.length === 0 && (
           <tr>
-            <td colSpan="9" className="text-center text-muted py-4">
+            <td colSpan="10" className="text-center text-muted py-4">
               No hay rentas registradas
             </td>
           </tr>
@@ -58,7 +78,7 @@ const RentalTable = ({
         {rentals.map((rental) => {
           const status = statusConfig[rental.status] || statusConfig.CREATED;
           return (
-            <tr key={rental.id}>
+            <tr key={rental.id} className={!rental.active ? "table-secondary" : ""}>
               <td>{rental.id}</td>
               <td>
                 <strong>{rental.client?.name}</strong>
@@ -95,64 +115,77 @@ const RentalTable = ({
                   {rental.user?.username || 'N/A'}
                 </small>
               </td>
+              {showInactive && <td>{rental.desactivationReason || "—"}</td>}
               <td>
-                {/* Agregamos flex-wrap para que los botones puedan bajar a otra línea si no caben todos en una sola fila */}
                 <div className="d-flex gap-1 flex-wrap">
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() => onView(rental)}
-                    title="Ver detalles"
-                  >
-                    <i className="bi bi-eye"></i>
-                  </button>
-                  {rental.status === 'CREATED' || rental.status === 'DELIVERED' && (
-                    <button
-                      className="btn btn-sm btn-outline-secondary"
-                      onClick={() => onChangeStatus(rental)}
-                      title="Cambiar estado"
-                    >
-                      <i className="bi bi-arrow-repeat"></i>
+                  {rental.active ? (
+                    <>
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => onView(rental)}
+                        title="Ver detalles"
+                      >
+                        <i className="bi bi-eye"></i>
+                      </button>
+                      {(rental.status === 'CREATED' || rental.status === 'DELIVERED') && (
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => onChangeStatus(rental)}
+                          title="Cambiar estado"
+                        >
+                          <i className="bi bi-arrow-repeat"></i>
+                        </button>
+                      )}
+                      {rental.status !== 'CANCELLED' && (
+                        <button
+                          className="btn btn-sm btn-outline-success"
+                          onClick={() => onPayment(rental)}
+                          title="Registrar pago"
+                        >
+                          <i className="bi bi-cash-coin"></i>
+                        </button>
+                      )}
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => onCancel(rental)}
+                        title="Cancelar"
+                      >
+                        <i className="bi bi-x-circle"></i>
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-warning"
+                        onClick={() => onEdit(rental)}
+                        title="Editar"
+                      >
+                        <i className="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => handleDeactivate(rental)}
+                        title="Desactivar"
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </>
+                  ) : (
+                    <button className="btn btn-sm btn-outline-success"
+                      title="Reactivar"
+                      onClick={async () => {
+                        const r = await Swal.fire({
+                          title: "¿Reactivar renta?",
+                          text: `Se reactivará la renta #${rental.id}`,
+                          icon: "question",
+                          showCancelButton: true,
+                          confirmButtonText: "Reactivar",
+                          cancelButtonText: "Cancelar",
+                          confirmButtonColor: "#198754"
+                        });
+                        if (r.isConfirmed) onActivate(rental.id);
+                      }}>
+                      <i className="bi bi-arrow-counterclockwise"></i>
+                      <span className="d-none d-md-inline"> Reactivar</span>
                     </button>
                   )}
-
-                  {/* Botón de pagos en la tabla
-                  Condición: rental.status !== 'CANCELLED'
-                  - Solo aparece si la renta no está cancelada
-                  onClick: LLamamos directamente a onPayment(rental)
-                  - No necesitamos e.stopPropagation() aquí porque
-                    la fila de la tabla no tiene onClick */}
-
-                  {rental.status !== 'CANCELLED' && (
-                    <button
-                      className="btn btn-sm btn-outline-success"
-                      onClick={() => onPayment(rental)}
-                      title="Registrar pago"
-                    >
-                      <i className="bi bi-cash-coin"></i>
-                    </button>
-                  )}
-
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => onCancel(rental)}
-                    title="Cancelar"
-                  >
-                    <i className="bi bi-x-circle"></i>
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-warning"
-                    onClick={() => onEdit(rental)}
-                    title="Editar"
-                  >
-                    <i className="bi bi-pencil"></i>
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => onDelete(rental.id)}
-                    title="Eliminar"
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
                 </div>
               </td>
             </tr>

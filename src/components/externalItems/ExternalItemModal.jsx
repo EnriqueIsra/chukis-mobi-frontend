@@ -1,8 +1,27 @@
 import PropTypes from "prop-types";
+import Swal from "sweetalert2";
 import { ExternalItemForm } from "./ExternalItemForm";
 
-export const ExternalItemModal = ({ isOpen, onClose, handlerAdd, itemSelected, providers }) => {
+export const ExternalItemModal = ({ isOpen, onClose, handlerAdd, itemSelected, providers, lockRentalId = false }) => {
   if (!isOpen) return null;
+
+  const isEditing = itemSelected.id > 0;
+
+  const handleSave = async (item) => {
+    await handlerAdd(item);
+    if (isEditing) {
+      onClose();
+    } else {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "Ítem registrado",
+        showConfirmButton: false,
+        timer: 2000
+      });
+    }
+  };
 
   return (
     <>
@@ -23,7 +42,7 @@ export const ExternalItemModal = ({ isOpen, onClose, handlerAdd, itemSelected, p
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">
-                {itemSelected.id > 0 ? 'Editar Ítem' : 'Registrar Ítem Externo'}
+                {isEditing ? "Editar Ítem" : "Registrar Ítem Externo"}
               </h5>
               <button
                 type="button"
@@ -35,28 +54,26 @@ export const ExternalItemModal = ({ isOpen, onClose, handlerAdd, itemSelected, p
             <div className="modal-body">
               <ExternalItemForm
                 formId="external-item-modal-form"
-                handlerAdd={(item) => {
-                  handlerAdd(item);
-                  onClose();
-                }}
+                handlerAdd={handleSave}
                 itemSelected={itemSelected}
                 providers={providers}
+                lockRentalId={lockRentalId}
               />
             </div>
             <div className="modal-footer">
               <button
                 type="button"
-                className="btn btn-danger"
+                className={`btn ${isEditing ? "btn-danger" : "btn-secondary"}`}
                 onClick={onClose}
               >
-                Cancelar
+                {isEditing ? "Cancelar" : "Cerrar"}
               </button>
               <button
                 type="submit"
                 form="external-item-modal-form"
                 className="btn btn-primary"
               >
-                {itemSelected.id > 0 ? 'Actualizar' : 'Registrar'}
+                {isEditing ? "Actualizar" : "Registrar"}
               </button>
             </div>
           </div>
@@ -71,5 +88,6 @@ ExternalItemModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   handlerAdd: PropTypes.func.isRequired,
   itemSelected: PropTypes.object.isRequired,
-  providers: PropTypes.array.isRequired
+  providers: PropTypes.array.isRequired,
+  lockRentalId: PropTypes.bool
 };

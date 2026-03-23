@@ -4,6 +4,7 @@ import * as providerService from "../services/providerService";
 import { ExternalItemTable } from "../components/externalItems/ExternalItemTable";
 import { ExternalItemModal } from "../components/externalItems/ExternalItemModal";
 import { RentalProfitabilityCard } from "../components/externalItems/RentalProfitabilityCard";
+import { RentalSearchDropdown } from "../components/externalItems/RentalSearchDropdown";
 import { ModuleHeader } from "../components/common/ModuleHeader";
 
 const emptyItem = {
@@ -15,10 +16,10 @@ export const RentalExternalItemsPage = () => {
 
     const [items, setItems] = useState([]);
     const [providers, setProviders] = useState([]);
+    const [selectedRental, setSelectedRental] = useState(null);
     const [showInactive, setShowInactive] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [itemSelected, setItemSelected] = useState(emptyItem);
-    const [rentalIdFilter, setRentalIdFilter] = useState("");
     const [profitability, setProfitability] = useState(null);
 
     useEffect(() => {
@@ -27,26 +28,44 @@ export const RentalExternalItemsPage = () => {
         });
     }, []);
 
-    const loadItems = async () => {
+    // Carga inicial: todos los items activos o inactivos
+    const loadAllItems = async () => {
         const res = showInactive
             ? await itemService.findInactive()
             : await itemService.findAll();
         if (res) setItems(res.data);
-        setProfitability(null);
+    };
+
+    const loadItemsForRental = async (rentalId, inactive = false) => {
+        if (inactive) {
+            // No hay endpoint de inactivos por renta, filtramos client-side
+            const res = await itemService.findInactive();
+            if (res) setItems(res.data.filter(item => item.rentalId === rentalId));
+        } else {
+            const res = await itemService.findByRental(rentalId);
+            if (res) setItems(res.data);
+        }
+        const profRes = await itemService.getProfitability(rentalId);
+        if (profRes) setProfitability(profRes.data);
     };
 
     useEffect(() => {
-        loadItems();
-    }, [showInactive]);
+        if (selectedRental) {
+            loadItemsForRental(selectedRental.id, showInactive);
+        } else {
+            loadAllItems();
+        }
+    }, [showInactive, selectedRental]);
 
-    const handleSearchByRental = async () => {
-        if (!rentalIdFilter) return;
-        const res = await itemService.findByRental(rentalIdFilter);
-        if (res) setItems(res.data);
+    const handleSelectRental = (rental) => {
+        setSelectedRental(rental);
+        setShowInactive(false);
+    };
 
-        // Cargar rentabilidad de esa renta
-        const profRes = await itemService.getProfitability(rentalIdFilter);
-        if (profRes) setProfitability(profRes.data);
+    const handleClearRental = () => {
+        setSelectedRental(null);
+        setItems([]);
+        setProfitability(null);
     };
 
     const handleAdd = async (item) => {
@@ -62,8 +81,12 @@ export const RentalExternalItemsPage = () => {
         } else {
             await itemService.create(itemToSend);
         }
-        setItemSelected(emptyItem);
-        loadItems();
+        setItemSelected({ ...emptyItem, rentalId: selectedRental?.id || "" });
+        if (selectedRental) {
+            loadItemsForRental(selectedRental.id, showInactive);
+        } else {
+            loadAllItems();
+        }
     };
 
     const handleEdit = (item) => {
@@ -73,28 +96,39 @@ export const RentalExternalItemsPage = () => {
 
     const handleDeactivate = async (id, reason) => {
         await itemService.deactivate(id, reason, currentUser.id);
-        loadItems();
+        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
+        else loadAllItems();
     };
 
     const handleActivate = async (id) => {
         await itemService.activate(id);
-        loadItems();
+        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
+        else loadAllItems();
     };
 
     const handleOpenModal = () => {
-        setItemSelected({ ...emptyItem, rentalId: rentalIdFilter || "" });
+        setItemSelected({ ...emptyItem, rentalId: selectedRental?.id || "" });
         setIsModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setItemSelected(emptyItem);
+        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
+        else loadAllItems();
     };
 
     return (
         <>
             <ModuleHeader title="Mobiliario Subcontratado">
-                <div className="col-12 col-lg-auto">
-                    <button className="btn btn-primary w-100" onClick={handleOpenModal}>
-                        <i className="bi bi-plus-lg me-1"></i>
-                        Registrar Ítem
-                    </button>
-                </div>
+                {selectedRental && (
+                    <div className="col-12 col-lg-auto">
+                        <button className="btn btn-primary w-100" onClick={handleOpenModal}>
+                            <i className="bi bi-plus-lg me-1"></i>
+                            Registrar Ítem
+                        </button>
+                    </div>
+                )}
                 <div className="col-12 col-lg-auto">
                     <div className="btn-group">
                         <button
@@ -111,34 +145,18 @@ export const RentalExternalItemsPage = () => {
                         </button>
                     </div>
                 </div>
-                <div className="col-12 col-lg">
-                    <div className="input-group">
-                        <input
-                            type="number"
-                            className="form-control"
-                            placeholder="# Renta"
-                            value={rentalIdFilter}
-                            onChange={(e) => setRentalIdFilter(e.target.value)}
-                        />
-                        <button className="btn btn-outline-secondary" onClick={handleSearchByRental}>
-                            <i className="bi bi-search"></i>
-                        </button>
-                        <button
-                            className="btn btn-outline-secondary"
-                            onClick={() => {
-                                setRentalIdFilter("");
-                                setProfitability(null);
-                                loadItems();
-                            }}
-                        >
-                            <i className="bi bi-x"></i>
-                        </button>
-                    </div>
-                </div>
             </ModuleHeader>
 
-            {/* Tarjeta de rentabilidad — aparece al buscar por renta */}
-            <RentalProfitabilityCard profitability={profitability} />
+            {/* Buscador fuera del header para que el dropdown no se corte */}
+            <div className="mb-3">
+                <RentalSearchDropdown
+                    selectedRental={selectedRental}
+                    onSelect={handleSelectRental}
+                    onClear={handleClearRental}
+                />
+            </div>
+
+            {selectedRental && <RentalProfitabilityCard profitability={profitability} />}
 
             <ExternalItemTable
                 items={items}
@@ -150,13 +168,11 @@ export const RentalExternalItemsPage = () => {
 
             <ExternalItemModal
                 isOpen={isModalOpen}
-                onClose={() => {
-                    setIsModalOpen(false);
-                    setItemSelected(emptyItem);
-                }}
+                onClose={handleModalClose}
                 handlerAdd={handleAdd}
                 itemSelected={itemSelected}
                 providers={providers}
+                lockRentalId={!!selectedRental}
             />
         </>
     );

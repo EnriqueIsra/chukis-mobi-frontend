@@ -4,7 +4,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { findAll, remove, updateRentalStatus } from "../services/rentalService";
+import { findAll, deactivate, updateRentalStatus } from "../services/rentalService";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import "./CalendarPage.css";
 import RentalDetailModal from "../components/rentals/RentalDetailModal";
@@ -219,27 +219,9 @@ export const CalendarPage = () => {
     }
   };
 
-  const handleDeleteRental = async (id) => {
-    const result = await Swal.fire({
-      title: "¿Eliminar renta?",
-      text: "Esta acción no se puede deshacer",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#6c757d",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar"
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await remove(id);
-        Swal.fire("Eliminada", "La renta ha sido eliminada", "success");
-        getRentals();
-      } catch (error) {
-        Swal.fire("Error", "No se pudo eliminar la renta", "error");
-      }
-    }
+  const handleDeactivateRental = async (id, reason) => {
+    await deactivate(id, reason, userId);
+    getRentals();
   };
 
   // Cerrar wizard
@@ -372,7 +354,7 @@ export const CalendarPage = () => {
           onEdit={handleEditRental}
           onChangeStatus={handleChangeStatus}
           onCancel={handleCancelRental}
-          onDelete={handleDeleteRental}
+          onDeactivate={handleDeactivateRental}
           onPayment={handlePayment}
         />
       )}

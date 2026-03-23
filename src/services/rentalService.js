@@ -36,13 +36,32 @@ export const updateRental = async (id, rentalRequest) => {
 /**
  * Eliminar renta (opcional por ahora)
  */
-export const remove = async (id) => {
+export const findInactive = async () => {
   try {
-    await axiosInstance.delete(`/rentals/${id}`);
+    const response = await axiosInstance.get("/rentals/inactive");
+    return response;
   } catch (error) {
-    console.error("Error deleting rental:", error);
-    throw error;
+    console.error(error);
   }
+  return null;
+};
+
+export const deactivate = async (id, reason, userId) => {
+  try {
+    return await axiosInstance.patch(`/rentals/${id}/deactivate`, { reason, userId });
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
+};
+
+export const activate = async (id) => {
+  try {
+    return await axiosInstance.patch(`/rentals/${id}/activate`);
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
 };
 
 // Cambiar solo el status de la renta

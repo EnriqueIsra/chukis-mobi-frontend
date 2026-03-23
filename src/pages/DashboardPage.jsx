@@ -5,7 +5,7 @@ import { QuickActions } from '../components/dashboard/QuickActions';
 // Importamos la funcion existente + las 2 nuevas del dashboardService
 import { getStats, getDeliveries, getMonthlyIncome, getPendingRentals, getDeliveredRentals } from '../services/dashboardService'
 // Importamos funciones del rentalService para las acciones del modal
-import { findById, remove, updateRentalStatus } from "../services/rentalService";
+import { findById, deactivate, updateRentalStatus } from "../services/rentalService";
 
 // Importamos los componentes que creamos
 // DeliverySection: lista de entregas hoy/mañana
@@ -256,27 +256,9 @@ export const DashboardPage = () => {
     }
   }
 
-  // Eliminar renta -> confirmación y elimina del backend
-  const handleDeleteRental = async (id) => {
-    const result = await Swal.fire({
-      title: '¿Eliminar renta?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    })
-    if (result.isConfirmed) {
-      try {
-        await remove(id)
-        Swal.fire('Eliminada', 'La renta ha sido eliminada de la base de datos', 'success')
-        fetchAllData()
-      } catch (error) {
-        Swal.fire('Error', 'No se pudo eliminar la renta', 'error')
-      }
-    }
+  const handleDeactivateRental = async (id, reason) => {
+    await deactivate(id, reason, userId);
+    fetchAllData();
   }
 
   // Abrir modal de pagos
@@ -524,7 +506,7 @@ export const DashboardPage = () => {
           onEdit={handleEditRental}
           onChangeStatus={handleChangeStatus}
           onCancel={handleCancelRental}
-          onDelete={handleDeleteRental}
+          onDeactivate={handleDeactivateRental}
           onPayment={handlePayment}
         />
       )}

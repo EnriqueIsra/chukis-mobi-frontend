@@ -16,6 +16,7 @@ export const ExternalItemForm = ({
   itemSelected,
   formId = "external-item-form",
   providers,
+  lockRentalId = false,
 }) => {
   const [form, setForm] = useState(initialDataForm);
   const { rentalId, providerId, description, quantity, unitCost, notes } = form;
@@ -47,16 +48,23 @@ export const ExternalItemForm = ({
     >
       {/* ID de la renta */}
       <div>
-        <input
-          placeholder="# Renta"
-          type="number"
-          className="form-control my-3 w-100"
-          name="rentalId"
-          value={rentalId}
-          onChange={(event) =>
-            setForm({ ...form, rentalId: event.target.value })
-          }
-        />
+        {lockRentalId ? (
+          <div className="form-control my-3 w-100 bg-light">
+            <i className="bi bi-lock me-1"></i>
+            Renta #{rentalId}
+          </div>
+        ) : (
+          <input
+            placeholder="# Renta"
+            type="number"
+            className="form-control my-3 w-100"
+            name="rentalId"
+            value={rentalId}
+            onChange={(event) =>
+              setForm({ ...form, rentalId: event.target.value })
+            }
+          />
+        )}
       </div>
 
       {/* Select de proveedores */}
@@ -146,5 +154,6 @@ ExternalItemForm.propTypes = {
   handlerAdd: PropTypes.func.isRequired,
   itemSelected: PropTypes.object.isRequired,
   formId: PropTypes.string,
-  providers: PropTypes.array.isRequired
+  providers: PropTypes.array.isRequired,
+  lockRentalId: PropTypes.bool
 };

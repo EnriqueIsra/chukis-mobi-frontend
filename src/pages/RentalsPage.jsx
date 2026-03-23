@@ -4,37 +4,28 @@ import { RentalsToolbar } from "../components/rentals/RentalToolBar";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
-import { findAll, remove, updateRentalStatus } from "../services/rentalService";
-import PaymentModal from "../components/payments/PaymentModal"  // Importamos el componente PaymentModal
+import { findAll, findInactive, deactivate, activate, updateRentalStatus } from "../services/rentalService";
+import PaymentModal from "../components/payments/PaymentModal";
 import RentalDetailModal from "../components/rentals/RentalDetailModal";
 import { ModuleHeader } from "../components/common/ModuleHeader";
 
 export const RentalsPage = () => {
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+  const userId = currentUser?.id;
+
   const [rentals, setRentals] = useState([]);
   const [viewMode, setViewMode] = useState("cards");
+  const [showInactive, setShowInactive] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [rentalToEdit, setRentalToEdit] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-
-  // Estado para controlar el modal de pagos. 
-  // paymentRental guarda la renta seleccionada para pagos, 
-  // - si es null: el modal está cerrado, 
-  // - si tiene una renta: el modal está abierto mostrando esa renta. 
-  // Usamos la renta completa no solo el id porque el modal necesita mostrar informacion como el total de la renta
   const [paymentRental, setPaymentRental] = useState(null);
-
-  // Renta seleccionada para el modal de detalles
-  // null = modal cerrado, objeto = modal abierto
-  const [selectedRental, setSelectedRental] = useState(null)
-
-  // Obtener el usuario logueado del localStorage
-  const loggedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = loggedUser?.id;
+  const [selectedRental, setSelectedRental] = useState(null);
 
   const getRentals = async () => {
     setLoading(true);
-    const result = await findAll();
+    const result = showInactive ? await findInactive() : await findAll();
     if (result && result.data) {
       setRentals(result.data);
     }
@@ -43,41 +34,23 @@ export const RentalsPage = () => {
 
   useEffect(() => {
     getRentals();
-  }, []);
+  }, [showInactive]);
 
   const filteredRentals = Array.isArray(rentals) ? rentals.filter(rental => {
-    const search = searchTerm.toLowerCase()
-
-    // Campos directos
+    const search = searchTerm.toLowerCase();
     const matchAddress = rental.address?.toLowerCase().includes(search);
     const matchStatus = rental.status?.toLowerCase().includes(search);
     const matchTotal = rental.total?.toString().includes(search);
-
-    // Campos del cliente (objeto anidado)
     const matchClientName = rental.client?.name?.toLowerCase().includes(search);
     const matchClientPhone = rental.client?.phone?.includes(search);
-
-    // Usuario
     const matchUsername = rental.user?.username?.toLowerCase().includes(search);
-
-    // Items (array) - busca si AL MENOS UN item coincide
     const matchItems = rental.items?.some(item =>
       item.productName?.toLowerCase().includes(search) ||
       item.quantity?.toString().includes(search) ||
       item.unitPrice?.toString().includes(search)
     );
-
-    return (
-      matchAddress ||
-      matchStatus ||
-      matchTotal ||
-      matchClientName ||
-      matchClientPhone ||
-      matchUsername ||
-      matchItems
-    );
-  })
-    : []
+    return matchAddress || matchStatus || matchTotal || matchClientName || matchClientPhone || matchUsername || matchItems;
+  }) : [];
 
   const handlerOpenWizard = () => {
     setRentalToEdit(null);
@@ -89,42 +62,23 @@ export const RentalsPage = () => {
     setRentalToEdit(null);
   };
 
-  const handlerSuccess = () => {
-    getRentals();
-  };
+  const handlerSuccess = () => getRentals();
 
   const handlerEditRental = (rental) => {
     setRentalToEdit(rental);
     setIsWizardOpen(true);
   };
 
-  // Ver detalles de una renta -> abre el RentalDetailModal
-  const handlerViewRental = (rental) => {
-    setSelectedRental(rental)
+  const handlerViewRental = (rental) => setSelectedRental(rental);
+
+  const handleDeactivate = async (id, reason) => {
+    await deactivate(id, reason, currentUser.id);
+    getRentals();
   };
 
-  const handlerDeleteRental = async (id) => {
-    const result = await Swal.fire({
-      title: '¿Eliminar renta?',
-      text: 'Esta acción no se puede deshacer',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar'
-    });
-
-    if (result.isConfirmed) {
-      try {
-        await remove(id);
-        Swal.fire('Eliminada', 'La renta ha sido eliminada', 'success');
-        getRentals();
-      } catch (error) {
-        console.error(error)
-        Swal.fire('Error', 'No se pudo eliminar la renta', 'error');
-      }
-    }
+  const handleActivate = async (id) => {
+    await activate(id);
+    getRentals();
   };
 
   const handlerChangeStatus = (rental) => {
@@ -135,12 +89,12 @@ export const RentalsPage = () => {
         ${rental.status === 'CREATED' ? `
           <button id="deliveredBtn" class="btn btn-warning">
             <i class="bi bi-truck me-1"></i> Marcar como Entregada
-          </button>  
+          </button>
         ` : ''}
         ${rental.status === 'DELIVERED' ? `
           <button id="pickedUpBtn" class="btn btn-success">
             <i class="bi bi-check-circle me-1"></i> Marcar como Recogida
-          </button>  
+          </button>
         ` : ''}
         </div>
       `,
@@ -148,14 +102,11 @@ export const RentalsPage = () => {
       showCancelButton: true,
       cancelButtonText: 'Cerrar',
       didOpen: () => {
-        document
-          .getElementById('deliveredBtn')
+        document.getElementById('deliveredBtn')
           ?.addEventListener('click', async () => {
             await changeStatus(rental.id, 'DELIVERED');
           });
-
-        document
-          .getElementById('pickedUpBtn')
+        document.getElementById('pickedUpBtn')
           ?.addEventListener('click', async () => {
             await changeStatus(rental.id, 'PICKED_UP');
           });
@@ -167,13 +118,12 @@ export const RentalsPage = () => {
     try {
       await updateRentalStatus(id, status);
       Swal.fire('Actualizado', 'El estado fue actualizado correctamente', 'success');
-      getRentals(); // refresca lista
+      getRentals();
     } catch (error) {
-      console.error(error)
+      console.error(error);
       Swal.fire('Error', 'No se pudo cambiar el estado', 'error');
     }
   };
-
 
   const handlerCancelRental = async (rental) => {
     const result = await Swal.fire({
@@ -185,7 +135,6 @@ export const RentalsPage = () => {
       confirmButtonText: 'Sí, cancelar',
       cancelButtonText: 'Volver'
     });
-
     if (result.isConfirmed) {
       try {
         await updateRentalStatus(rental.id, 'CANCELLED');
@@ -197,28 +146,9 @@ export const RentalsPage = () => {
     }
   };
 
-  // Handler para ABRIR el modal de pagos
-  // Recibe el objeto rental completo desde RentalCard o RentalTable
-  // Al hacer serPaymentRental(rental), React re-renderiza y el modal se muestra porque paymentRental ya no es null
-  const handlerOpenPayment = (rental) => {
-    setPaymentRental(rental)
-  }
-
-  // Handler para cerrar el modal de pagos
-  // Al hacer setPaymentRental(null), react re-renderiza y 
-  // el modal se oculta porque la condición {paymentRental && ...}
-  // es falsa cuando paymentRental es null
-  const handlerClosePayment = () => {
-    setPaymentRental(null)
-  }
-
-  // Callback cuando se crea un pago exitosamente
-  // Este callback se ejecuta desde PaymentModal después de registrar un pago. 
-  // Llamamos a getRentals() para recargar la lista de rentas y que se actualicen 
-  // los totales en las tarjetas/tabla si en el futuro mostramos el saldo
-  const handlerPaymentCreated = () => {
-    getRentals()
-  }
+  const handlerOpenPayment = (rental) => setPaymentRental(rental);
+  const handlerClosePayment = () => setPaymentRental(null);
+  const handlerPaymentCreated = () => getRentals();
 
   return (
     <>
@@ -242,9 +172,25 @@ export const RentalsPage = () => {
         <div className="col-12 col-lg-auto">
           <RentalsToolbar viewMode={viewMode} setViewMode={setViewMode} />
         </div>
+
+        <div className="col-12 col-lg-auto">
+          <div className="btn-group">
+            <button
+              className={`btn btn-outline-secondary ${!showInactive ? "active" : ""}`}
+              onClick={() => setShowInactive(false)}
+            >
+              <i className="bi bi-eye me-1"></i>Activos
+            </button>
+            <button
+              className={`btn btn-outline-secondary ${showInactive ? "active" : ""}`}
+              onClick={() => setShowInactive(true)}
+            >
+              <i className="bi bi-eye-slash me-1"></i>Inactivos
+            </button>
+          </div>
+        </div>
       </ModuleHeader>
 
-      {/* Loading */}
       {loading ? (
         <div className="text-center py-5">
           <div className="spinner-border text-primary" role="status">
@@ -256,20 +202,17 @@ export const RentalsPage = () => {
           rentals={filteredRentals}
           onView={handlerViewRental}
           onEdit={handlerEditRental}
-          onDelete={handlerDeleteRental}
+          onDeactivate={handleDeactivate}
+          onActivate={handleActivate}
           onChangeStatus={handlerChangeStatus}
           onCancel={handlerCancelRental}
-          // Pasamos el handler de los pagos a RentalTable
-          // Cuando el usuario haga clic en el botón de pagos
-          // en la tabla, se ejecutará handlerOpenPayment
           onPayment={handlerOpenPayment}
+          showInactive={showInactive}
         />
       ) : (
         <div className="row">
-          {rentals.length === 0 ? (
-            <div className="col-12 text-center text-muted py-4">
-              No hay rentas registradas
-            </div>
+          {filteredRentals.length === 0 ? (
+            <p className="text-muted">No hay rentas registradas</p>
           ) : (
             filteredRentals.map((rental) => (
               <RentalCard
@@ -277,13 +220,10 @@ export const RentalsPage = () => {
                 rental={rental}
                 onView={handlerViewRental}
                 onEdit={handlerEditRental}
-                onDelete={handlerDeleteRental}
+                onDeactivate={handleDeactivate}
+                onActivate={handleActivate}
                 onChangeStatus={handlerChangeStatus}
                 onCancel={handlerCancelRental}
-                // Pasamos el handler de pagos a RentalCard
-                // Igual que con RentalTable, cuando el usuario
-                // haga clic en el botón de pagos en la tarjeta,
-                // se ejecutará handlerOpenPayment
                 onPayment={handlerOpenPayment}
               />
             ))
@@ -291,7 +231,6 @@ export const RentalsPage = () => {
         </div>
       )}
 
-      {/* Wizard */}
       {isWizardOpen && (
         <RentalWizard
           onClose={handlerCloseWizard}
@@ -301,14 +240,6 @@ export const RentalsPage = () => {
         />
       )}
 
-      {/* Renderizado condicional del PaymentModal
-      {paymentRental && ...} significa:
-      - Si paymentRental tiene valor (no es null) -> renderiza el modal
-      - Si paymentRental es null -> no renderiza nada
-      Props que le pasamos
-      - rental: La renta seleccionada (para mostrar su info y total)
-      - onClose: Función para cerrar el modal
-      - onPaymentCreated: Callback para recargar datos después de un pago */}
       {paymentRental && (
         <PaymentModal
           rental={paymentRental}
@@ -317,7 +248,6 @@ export const RentalsPage = () => {
         />
       )}
 
-      {/* Modal de detalles de renta */}
       {selectedRental && (
         <RentalDetailModal
           rental={selectedRental}
@@ -325,7 +255,7 @@ export const RentalsPage = () => {
           onEdit={handlerEditRental}
           onChangeStatus={handlerChangeStatus}
           onCancel={handlerCancelRental}
-          onDelete={handlerDeleteRental}
+          onDeactivate={handleDeactivate}
           onPayment={handlerOpenPayment}
         />
       )}
