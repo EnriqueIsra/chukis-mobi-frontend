@@ -47,6 +47,8 @@ export const DashboardPage = () => {
 
   // Estado para los ingresos del mes (gráfica). Array de DailyIncomeDTO: { date, cobrado, anticipos, porCobrar }
   const [incomeData, setIncomeData] = useState([])
+  const [incomeYear, setIncomeYear] = useState(new Date().getFullYear())
+  const [incomeMonth, setIncomeMonth] = useState(new Date().getMonth() + 1)
 
   // Loading separado para entregas y gráfica 
   // Así cada sección puede cargar independientemente sin bloquear las demás.
@@ -114,10 +116,10 @@ export const DashboardPage = () => {
   }
 
   // Función para cargar los ingresos del mes
-  const fetchIncome = async () => {
+  const fetchIncome = async (year, month) => {
     setLoadingIncome(true)
     try {
-      const response = await getMonthlyIncome();
+      const response = await getMonthlyIncome(year, month);
       setIncomeData(response.data || [])
     } catch (error) {
       console.error("Error fetching income: ", error)
@@ -158,7 +160,7 @@ export const DashboardPage = () => {
   const fetchAllData = () => {
     fetchStats()
     fetchDeliveries()
-    fetchIncome()
+    fetchIncome(incomeYear, incomeMonth)
     fetchPendingRentals()
     fetchDeliveredRentals()
   }
@@ -168,6 +170,13 @@ export const DashboardPage = () => {
   useEffect(() => {
     fetchAllData();
   }, []);
+
+  // Recargar gráfica cuando cambia el mes seleccionado
+  const handleIncomeMonthChange = (year, month) => {
+    setIncomeYear(year)
+    setIncomeMonth(month)
+    fetchIncome(year, month)
+  }
 
   // Handlers
   // Clic en una renta del dropdown -> busca la renta completa (con items) y abre el modal
@@ -277,16 +286,14 @@ export const DashboardPage = () => {
     }).format(value || 0);
   };
 
-  // Formatear solo la hora: "2026-02-18T10:00:00" -> "10:00 a.m."
-  // Se usa en el badge de hora del dropdown
-  const formatTime = (dateTimeStr) => {
+  // Formatear fecha completa: "miércoles, 1 de abril de 2026, 01:00 p.m."
+  const formatDateLong = (dateTimeStr) => {
     if (!dateTimeStr) return 'N/A'
     const date = new Date(dateTimeStr)
-    return date.toLocaleTimeString('es-MX', {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-    )
+    return date.toLocaleDateString('es-MX', {
+      weekday: "long", day: "numeric", month: "long", year: "numeric",
+      hour: "2-digit", minute: "2-digit"
+    })
   }
 
   // Obtener nombre del mes actual en español
@@ -350,7 +357,7 @@ export const DashboardPage = () => {
                   style={{ cursor: 'pointer' }}
                   onClick={(e) => { e.stopPropagation(); handleRentalClick(rental.id) }}
                 >
-                  {/* Fila superior: cliente + hora */}
+                  {/* Cliente */}
                   <div className="d-flex justify-content-between align-items-start mb-1">
                     <div>
                       <span className="fw-semibold">
@@ -362,10 +369,13 @@ export const DashboardPage = () => {
                         {rental.clientPhone}
                       </small>
                     </div>
-                    <span className="badge bg-primary">
-                      <i className="bi bi-clock me-1"></i>
-                      {formatTime(rental.startDate)}
-                    </span>
+                  </div>
+                  {/* Fecha de entrega */}
+                  <div className="mb-1">
+                    <small className="text-capitalize">
+                      <i className="bi bi-calendar-event me-1 text-primary"></i>
+                      <strong>Entrega:</strong> {formatDateLong(rental.startDate)}
+                    </small>
                   </div>
                   {/* Dirección */}
                   <div className="mb-1">
@@ -420,7 +430,7 @@ export const DashboardPage = () => {
                   style={{ cursor: 'pointer' }}
                   onClick={(e) => { e.stopPropagation(); handleRentalClick(rental.id) }}
                 >
-                  {/* Fila superior: cliente + hora */}
+                  {/* Cliente */}
                   <div className="d-flex justify-content-between align-items-start mb-1">
                     <div>
                       <span className="fw-semibold">
@@ -432,10 +442,13 @@ export const DashboardPage = () => {
                         {rental.clientPhone}
                       </small>
                     </div>
-                    <span className="badge bg-warning text-dark">
-                      <i className="bi bi-clock me-1"></i>
-                      {formatTime(rental.endDate)}
-                    </span>
+                  </div>
+                  {/* Fecha de recolección */}
+                  <div className="mb-1">
+                    <small className="text-capitalize">
+                      <i className="bi bi-calendar-check me-1 text-warning"></i>
+                      <strong>Recoger:</strong> {formatDateLong(rental.endDate)}
+                    </small>
                   </div>
                   {/* Dirección */}
                   <div className="mb-1">
@@ -486,6 +499,7 @@ export const DashboardPage = () => {
             todayDeliveries={todayDeliveries}
             tomorrowDeliveries={tomorrowDeliveries}
             loading={loadingDeliveries}
+            onRentalClick={handleRentalClick}
           />
         </div>
         {/* Columna derecha: Gráfica de ingresos */}
@@ -493,6 +507,9 @@ export const DashboardPage = () => {
           <IncomeChart
             incomeData={incomeData}
             loading={loadingIncome}
+            selectedYear={incomeYear}
+            selectedMonth={incomeMonth}
+            onMonthChange={handleIncomeMonthChange}
           />
         </div>
       </div>

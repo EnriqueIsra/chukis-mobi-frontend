@@ -9,6 +9,11 @@ export const AddressAutocomplete = ({ value, onChange, placeholder = "Buscar dir
     const debounceRef = useRef(null)
     const wrapperRef = useRef(null)
 
+    // Sincronizar query con value externo (ej: "Usar dirección del cliente")
+    useEffect(() => {
+        setQuery(value || "");
+    }, [value]);
+
     // Cerrar dropdown al hacer clic fuera
     useEffect(() => {
         const handleClickOutside = (e) => {

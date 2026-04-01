@@ -45,7 +45,7 @@ const formatCurrency = (value) => {
 // Cada elemento del array tiene la estructura de RentalDetailDTO:
 // { id, clientName, clientPhone, address, startDate, endDate, status, productSummary, total, totalPaid, pending }.
 // =================
-const DeliverySection = ({ todayDeliveries, tomorrowDeliveries, loading }) => {
+const DeliverySection = ({ todayDeliveries, tomorrowDeliveries, loading, onRentalClick }) => {
 
     // Estado para la pestaña activa: "today" o "tomorrow"
     // Por defecto muestra las entregas de hoy
@@ -151,7 +151,12 @@ const DeliverySection = ({ todayDeliveries, tomorrowDeliveries, loading }) => {
                             const progressColor = getProgressColor(percentage)
 
                             return (
-                                <div key={delivery.id} className="delivery-item">
+                                <div
+                                    key={delivery.id}
+                                    className="delivery-item"
+                                    style={{ cursor: onRentalClick ? "pointer" : "default" }}
+                                    onClick={() => onRentalClick && onRentalClick(delivery.id)}
+                                >
                                     {/* ----- Fila superior: cliente + hora ----- */}
                                     <div className="d-flex justify-content-between align-items-start mb-1">
                                         <div>

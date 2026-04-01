@@ -54,7 +54,39 @@ const formatDateLabel = (dateStr) => {
 // Cada elemento: { date, cobrado, anticipos, porCobrar }
 // - loading: boolean que indica si se están cargando los datos.
 // ===============================
-const IncomeChart = ({ incomeData, loading }) => {
+const IncomeChart = ({ incomeData, loading, selectedYear, selectedMonth, onMonthChange }) => {
+
+    const today = new Date()
+    const currentYear = today.getFullYear()
+    const currentMonth = today.getMonth() + 1
+
+    const isCurrentMonth = selectedYear === currentYear && selectedMonth === currentMonth
+
+    const getMonthName = (year, month) => {
+        const date = new Date(year, month - 1)
+        return date.toLocaleDateString("es-MX", { month: "long", year: "numeric" })
+    }
+
+    const handlePrev = () => {
+        if (selectedMonth === 1) {
+            onMonthChange(selectedYear - 1, 12)
+        } else {
+            onMonthChange(selectedYear, selectedMonth - 1)
+        }
+    }
+
+    const handleNext = () => {
+        if (isCurrentMonth) return
+        if (selectedMonth === 12) {
+            onMonthChange(selectedYear + 1, 1)
+        } else {
+            onMonthChange(selectedYear, selectedMonth + 1)
+        }
+    }
+
+    const handleReset = () => {
+        onMonthChange(currentYear, currentMonth)
+    }
     // ===============================
     // Preparamos los datos para Chart.js
     // labels: array con las etiquetas del eje X (los días)
@@ -147,11 +179,37 @@ const IncomeChart = ({ incomeData, loading }) => {
     return (
         <div className="card shadow-sm income-chart-card">
             <div className="card-body">
-                {/* Título de la sección */}
-                <h5 className="card-title mb-3">
-                    <i className="bi bi-bar-chart-fill me-2 text-success"></i>
-                    Ingresos del Mes
-                </h5>
+                {/* Título con selector de mes */}
+                <div className="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                    <h5 className="card-title mb-0">
+                        <i className="bi bi-bar-chart-fill me-2 text-success"></i>
+                        Ingresos del Mes
+                    </h5>
+                    <div className="d-flex align-items-center gap-1">
+                        <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={handlePrev}
+                            title="Mes anterior"
+                        >
+                            <i className="bi bi-chevron-left"></i>
+                        </button>
+                        <button
+                            className={`btn btn-sm ${isCurrentMonth ? "btn-primary" : "btn-outline-primary"}`}
+                            onClick={handleReset}
+                            title={isCurrentMonth ? "Mes actual" : "Ir al mes actual"}
+                        >
+                            <span className="text-capitalize">{getMonthName(selectedYear, selectedMonth)}</span>
+                        </button>
+                        <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={handleNext}
+                            disabled={isCurrentMonth}
+                            title="Mes siguiente"
+                        >
+                            <i className="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
 
                 {/* Spinner mientras carga */}
                 {loading ? (

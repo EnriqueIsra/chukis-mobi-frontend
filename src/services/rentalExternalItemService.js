@@ -1,54 +1,43 @@
-/* Este archivo hace las llamadas HTTP al backend, Mismo patrón que el productService.js pero con los endpoints de gastos, incluyendo las funciones de desactivar/activar */
 import axiosInstance from "./axiosConfig"
 
-export const findAll = async () => {
+// Rentas que tienen subcontrato
+export const findRentalsWithSubcontract = async () => {
     try {
-        const response = await axiosInstance.get("/rental-external-items");
-        return response;
+        return await axiosInstance.get("/rentals/with-subcontract");
     } catch (error) {
         console.error(error);
     }
     return null;
 }
 
-export const findInactive = async () => {
-    try {
-        const response = await axiosInstance.get("/rental-external-items/inactive");
-        return response;
-    } catch (error) {
-        console.error(error);
-    }
-    return null;
-}
-
+// Items externos de una renta específica
 export const findByRental = async (rentalId) => {
     try {
-        const response = await axiosInstance.get(`/rental-external-items/by-rental/${rentalId}`)
-        return response
+        return await axiosInstance.get(`/rental-external-items/by-rental/${rentalId}`);
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
-    return null
+    return null;
 }
 
+// Rentabilidad de una renta
 export const getProfitability = async (rentalId) => {
     try {
-        const response = await axiosInstance.get(`/rental-external-items/profitability/${rentalId}`)
-        return response
+        return await axiosInstance.get(`/rental-external-items/profitability/${rentalId}`);
     } catch (error) {
-        console.error(error)
+        console.error(error);
     }
-    return null
+    return null;
 }
 
-export const create = async ({ rentalId, providerId, description, quantity, unitCost, notes }) => {
+// Crear item externo (nuevo payload: rentalItemId en vez de rentalId)
+export const create = async ({ rentalItemId, providerId, quantity, unitCost, notes }) => {
     try {
         return await axiosInstance.post("/rental-external-items", {
-            rentalId,
+            rentalItemId,
             providerId,
-            description, 
-            quantity, 
-            unitCost, 
+            quantity,
+            unitCost,
             notes
         });
     } catch (error) {
@@ -57,14 +46,14 @@ export const create = async ({ rentalId, providerId, description, quantity, unit
     return undefined;
 }
 
-export const update = async ({ id, rentalId, providerId, description, quantity, unitCost, notes }) => {
+// Actualizar item externo
+export const update = async ({ id, rentalItemId, providerId, quantity, unitCost, notes }) => {
     try {
         return await axiosInstance.put(`/rental-external-items/${id}`, {
-            rentalId,
+            rentalItemId,
             providerId,
-            description, 
-            quantity, 
-            unitCost, 
+            quantity,
+            unitCost,
             notes
         });
     } catch (error) {
@@ -73,7 +62,7 @@ export const update = async ({ id, rentalId, providerId, description, quantity, 
     return undefined;
 }
 
-// Borrado lógico - envpia el motivo y quién desactiva
+// Borrado lógico
 export const deactivate = async (id, reason, userId) => {
     try {
         return await axiosInstance.patch(`/rental-external-items/${id}/deactivate`, {
@@ -86,10 +75,10 @@ export const deactivate = async (id, reason, userId) => {
     return undefined;
 }
 
-// Reactivar un gasto desactivado
+// Reactivar
 export const activate = async (id) => {
     try {
-        return await axiosInstance.patch(`/rental-external-items/${id}/activate`)
+        return await axiosInstance.patch(`/rental-external-items/${id}/activate`);
     } catch (error) {
         console.error(error);
     }

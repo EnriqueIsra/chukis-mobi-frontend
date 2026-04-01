@@ -32,7 +32,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
   /* Reusa exactamente la misma lógica que ProductsPage */
   const filteredProducts = useProductFilter(products, searchTerm);
 
-  const addOrUpdateItem = (product, quantity) => {
+  const addOrUpdateItem = (product, quantity, subcontractedQuantity = 0) => {
     if (quantity <= 0) {
       setItems(items.filter((i) => i.productId !== product.id));
       return;
@@ -43,7 +43,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
     if (existing) {
       setItems(
         items.map((i) =>
-          i.productId === product.id ? { ...i, quantity } : i
+          i.productId === product.id ? { ...i, quantity, subcontractedQuantity } : i
         )
       );
     } else {
@@ -54,6 +54,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
           name: product.name,
           price: product.price,
           quantity,
+          subcontractedQuantity,
         },
       ]);
     }

@@ -58,7 +58,7 @@ export const ExpenseTable = ({
                         >
                             <td>{CATEGORY_LABELS[expense.category] || expense.category}</td>
                             <td>${expense.amount.toLocaleString()}</td>
-                            <td>{new Date(expense.expenseDate).toLocaleString("es-MX")}</td>
+                            <td className="text-capitalize">{new Date(expense.expenseDate).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
                             <td>{expense.description || "—"}</td>
                             <td>{expense.username}</td>
                             {showInactive && <td>{expense.desactivationReason || "—"}</td>}

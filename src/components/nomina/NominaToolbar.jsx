@@ -69,13 +69,13 @@ export const NominaToolbar = ({
             {currentUser?.role === "ADMIN" && (
                 <div className="btn-group">
                     <button
-                        className={`btn btn-outline-secondary ${!showInactive ? "active" : ""}`}
+                        className={`btn ${!showInactive ? "btn-primary" : "btn-outline-secondary"}`}
                         onClick={() => { if (showInactive) onToggleInactive(); }}
                     >
                         <i className="bi bi-eye me-1"></i>Activos
                     </button>
                     <button
-                        className={`btn btn-outline-secondary ${showInactive ? "active" : ""}`}
+                        className={`btn ${showInactive ? "btn-primary" : "btn-outline-secondary"}`}
                         onClick={() => { if (!showInactive) onToggleInactive(); }}
                     >
                         <i className="bi bi-eye-slash me-1"></i>Inactivos

@@ -93,3 +93,22 @@ export const findById = async (id) => {
     throw error;
   }
 }
+
+export const findWithContract = async () => {
+  try {
+    const response = await axiosInstance.get("/rentals/with-contract");
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
+  return null;
+}
+
+export const generateContract = async (id) => {
+  try {
+    return await axiosInstance.patch(`/rentals/${id}/generate-contract`);
+  } catch (error) {
+    console.error(error);
+  }
+  return undefined;
+}

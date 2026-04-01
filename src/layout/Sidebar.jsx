@@ -1,13 +1,14 @@
 import { NavLink } from "react-router-dom";
 import { menuItems } from "./menuConfig";
+import "./sidebar.css";
 
 export const Sidebar = ({ user, onLogout, collapsed, onToggle }) => {
   return (
     <div
-      className={`bg-dark text-white vh-100 d-flex flex-column p-3 ${
+      className={`sidebar-rgb text-white vh-100 d-flex flex-column p-3 ${
         collapsed ? "sidebar-collapsed" : ""
       }`}
-      style={{ width: collapsed ? "80px" : "230px", transition: "0.3s" }}
+      style={{ width: collapsed ? "80px" : "230px", minWidth: collapsed ? "80px" : "230px", transition: "0.3s" }}
     >
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-4">

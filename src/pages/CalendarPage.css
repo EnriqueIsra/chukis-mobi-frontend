@@ -385,6 +385,57 @@
   }
 }
 
+/* ========================================
+   DROPDOWNS DE BÚSQUEDA Y STATUS
+   ======================================== */
+
+.calendar-dropdown-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+}
+
+.calendar-dropdown-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.calendar-dropdowns-wrapper {
+  position: relative;
+}
+
+.calendar-dropdown {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.calendar-dropdown-right .calendar-dropdown {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+/* Legend items clickeables */
+.legend-item-clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.legend-item-clickable:active {
+  transform: scale(0.95);
+}
+
+.module-header .legend-item-active {
+  filter: brightness(1.4);
+  box-shadow: 0 0 12px var(--status-glow), 0 0 24px var(--status-glow);
+  animation: none;
+}
+
 /* Contenedor del calendario */
 .calendar-container {
   background: #fff;

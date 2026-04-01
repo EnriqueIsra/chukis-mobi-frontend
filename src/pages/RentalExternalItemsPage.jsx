@@ -1,179 +1,221 @@
 import { useState, useEffect } from "react";
 import * as itemService from "../services/rentalExternalItemService";
 import * as providerService from "../services/providerService";
-import { ExternalItemTable } from "../components/externalItems/ExternalItemTable";
-import { ExternalItemModal } from "../components/externalItems/ExternalItemModal";
-import { RentalProfitabilityCard } from "../components/externalItems/RentalProfitabilityCard";
-import { RentalSearchDropdown } from "../components/externalItems/RentalSearchDropdown";
+import { SubcontractModal } from "../components/externalItems/SubcontractModal";
 import { ModuleHeader } from "../components/common/ModuleHeader";
 
-const emptyItem = {
-    id: 0, rentalId: "", providerId: "", description: "", quantity: "", unitCost: "", notes: ""
+const statusConfig = {
+    CREATED: { label: "Creada", class: "bg-info", icon: "bi-clock" },
+    DELIVERED: { label: "Entregada", class: "bg-warning", icon: "bi-truck" },
+    PICKED_UP: { label: "Recogida", class: "bg-success", icon: "bi-check-circle" },
+    CANCELLED: { label: "Cancelada", class: "bg-danger", icon: "bi-x-circle" }
+};
+
+const formatDateLong = (dateTimeStr) => {
+    if (!dateTimeStr) return "N/A";
+    const date = new Date(dateTimeStr);
+    return date.toLocaleDateString("es-MX", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+    });
 };
 
 export const RentalExternalItemsPage = () => {
     const currentUser = JSON.parse(localStorage.getItem("user"));
 
-    const [items, setItems] = useState([]);
+    const [rentals, setRentals] = useState([]);
     const [providers, setProviders] = useState([]);
+    const [externalItemsByRental, setExternalItemsByRental] = useState({});
     const [selectedRental, setSelectedRental] = useState(null);
-    const [showInactive, setShowInactive] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [itemSelected, setItemSelected] = useState(emptyItem);
-    const [profitability, setProfitability] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Cargar rentas con subcontrato y proveedores
+    const loadData = async () => {
+        setLoading(true);
+        const [rentalsRes, providersRes] = await Promise.all([
+            itemService.findRentalsWithSubcontract(),
+            providerService.findAll()
+        ]);
+        if (rentalsRes?.data) {
+            setRentals(rentalsRes.data);
+            // Cargar external items de cada renta para saber pendientes vs completados
+            const itemsMap = {};
+            await Promise.all(rentalsRes.data.map(async (rental) => {
+                const res = await itemService.findByRental(rental.id);
+                if (res?.data) itemsMap[rental.id] = res.data;
+            }));
+            setExternalItemsByRental(itemsMap);
+        }
+        if (providersRes?.data) setProviders(providersRes.data);
+        setLoading(false);
+    };
 
     useEffect(() => {
-        providerService.findAll().then((res) => {
-            if (res) setProviders(res.data);
-        });
+        loadData();
     }, []);
 
-    // Carga inicial: todos los items activos o inactivos
-    const loadAllItems = async () => {
-        const res = showInactive
-            ? await itemService.findInactive()
-            : await itemService.findAll();
-        if (res) setItems(res.data);
+    // Determinar si una renta está completada
+    const isRentalCompleted = (rental) => {
+        const subItems = rental.items?.filter(i => i.subcontractedQuantity > 0) || [];
+        if (subItems.length === 0) return false;
+
+        const externalItems = externalItemsByRental[rental.id] || [];
+
+        return subItems.every(item => {
+            const assignedQty = externalItems
+                .filter(ext => ext.rentalItemId === item.id)
+                .reduce((sum, ext) => sum + ext.quantity, 0);
+            return assignedQty >= item.subcontractedQuantity;
+        });
     };
 
-    const loadItemsForRental = async (rentalId, inactive = false) => {
-        if (inactive) {
-            // No hay endpoint de inactivos por renta, filtramos client-side
-            const res = await itemService.findInactive();
-            if (res) setItems(res.data.filter(item => item.rentalId === rentalId));
-        } else {
-            const res = await itemService.findByRental(rentalId);
-            if (res) setItems(res.data);
-        }
-        const profRes = await itemService.getProfitability(rentalId);
-        if (profRes) setProfitability(profRes.data);
-    };
+    const pendingRentals = rentals.filter(r => !isRentalCompleted(r));
+    const completedRentals = rentals.filter(r => isRentalCompleted(r));
 
-    useEffect(() => {
-        if (selectedRental) {
-            loadItemsForRental(selectedRental.id, showInactive);
-        } else {
-            loadAllItems();
-        }
-    }, [showInactive, selectedRental]);
-
-    const handleSelectRental = (rental) => {
+    const handleOpenModal = (rental) => {
         setSelectedRental(rental);
-        setShowInactive(false);
     };
 
-    const handleClearRental = () => {
+    const handleCloseModal = () => {
         setSelectedRental(null);
-        setItems([]);
-        setProfitability(null);
+        loadData(); // Recargar al cerrar
     };
 
-    const handleAdd = async (item) => {
-        const itemToSend = {
-            ...item,
-            rentalId: Number(item.rentalId),
-            providerId: Number(item.providerId),
-            quantity: Number(item.quantity),
-            unitCost: Number(item.unitCost)
-        };
-        if (item.id > 0) {
-            await itemService.update(itemToSend);
-        } else {
-            await itemService.create(itemToSend);
-        }
-        setItemSelected({ ...emptyItem, rentalId: selectedRental?.id || "" });
-        if (selectedRental) {
-            loadItemsForRental(selectedRental.id, showInactive);
-        } else {
-            loadAllItems();
-        }
-    };
+    const RentalCard = ({ rental, isPending }) => {
+        const status = statusConfig[rental.status] || statusConfig.CREATED;
+        const subItemsCount = rental.items?.filter(i => i.subcontractedQuantity > 0).length || 0;
 
-    const handleEdit = (item) => {
-        setItemSelected(item);
-        setIsModalOpen(true);
-    };
+        const rentalTotal = rental.total || 0;
+        const externalItems = externalItemsByRental[rental.id] || [];
+        const totalExternalCost = externalItems.reduce((sum, ext) => sum + (ext.quantity * ext.unitCost), 0);
+        const profitability = rentalTotal - totalExternalCost;
 
-    const handleDeactivate = async (id, reason) => {
-        await itemService.deactivate(id, reason, currentUser.id);
-        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
-        else loadAllItems();
-    };
+        return (
+            <div className="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
+                <div
+                    className="card h-100 shadow-sm"
+                    style={{ cursor: "pointer", transition: "transform 0.2s" }}
+                    onClick={() => handleOpenModal(rental)}
+                    onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
+                    onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
+                >
+                    <div className="card-body">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                            <h6 className="fw-bold mb-0">#{rental.id}</h6>
+                            <div className="d-flex gap-1">
+                                <span className={`badge ${status.class}`}>
+                                    <i className={`bi ${status.icon} me-1`}></i>
+                                    {status.label}
+                                </span>
+                                <span className={`badge ${isPending ? "bg-warning text-dark" : "bg-success"}`}>
+                                    {isPending ? "Pendiente" : "Completado"}
+                                </span>
+                            </div>
+                        </div>
 
-    const handleActivate = async (id) => {
-        await itemService.activate(id);
-        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
-        else loadAllItems();
-    };
+                        <div className="small mb-1">
+                            <i className="bi bi-person me-1 text-primary"></i>
+                            {rental.client?.name || "Sin cliente"}
+                        </div>
+                        <div className="small mb-1 text-muted">
+                            <i className="bi bi-geo-alt me-1"></i>
+                            {rental.address || "Sin dirección"}
+                        </div>
+                        <div className="small mb-1 text-muted text-capitalize">
+                            <i className="bi bi-calendar-event me-1"></i>
+                            <strong>Inicio:</strong> {formatDateLong(rental.startDate)}
+                        </div>
+                        <div className="small mb-2 text-muted text-capitalize">
+                            <i className="bi bi-calendar-check me-1"></i>
+                            <strong>Fin:</strong> {formatDateLong(rental.endDate)}
+                        </div>
 
-    const handleOpenModal = () => {
-        setItemSelected({ ...emptyItem, rentalId: selectedRental?.id || "" });
-        setIsModalOpen(true);
-    };
+                        <div className="small mb-2">
+                            <i className="bi bi-truck me-1"></i>
+                            {subItemsCount} producto(s) subcontratado(s)
+                        </div>
 
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setItemSelected(emptyItem);
-        if (selectedRental) loadItemsForRental(selectedRental.id, showInactive);
-        else loadAllItems();
+                        <hr className="my-2" />
+
+                        <div className="d-flex justify-content-between small mb-1">
+                            <span className="text-muted">Total renta:</span>
+                            <strong className="text-dark">${rentalTotal.toLocaleString()}</strong>
+                        </div>
+                        <div className="d-flex justify-content-between small mb-1">
+                            <span className="text-muted">Costo subcontratado:</span>
+                            <strong className="text-danger">-${totalExternalCost.toLocaleString()}</strong>
+                        </div>
+                        <div className="d-flex justify-content-between small">
+                            <span className="text-muted">Rentabilidad:</span>
+                            <strong className={profitability >= 0 ? "text-success" : "text-danger"}>
+                                ${profitability.toLocaleString()}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
         <>
-            <ModuleHeader title="Mobiliario Subcontratado">
-                {selectedRental && (
-                    <div className="col-12 col-lg-auto">
-                        <button className="btn btn-primary w-100" onClick={handleOpenModal}>
-                            <i className="bi bi-plus-lg me-1"></i>
-                            Registrar Ítem
-                        </button>
-                    </div>
-                )}
-                <div className="col-12 col-lg-auto">
-                    <div className="btn-group">
-                        <button
-                            className={`btn btn-outline-secondary ${!showInactive ? "active" : ""}`}
-                            onClick={() => setShowInactive(false)}
-                        >
-                            <i className="bi bi-eye me-1"></i>Activos
-                        </button>
-                        <button
-                            className={`btn btn-outline-secondary ${showInactive ? "active" : ""}`}
-                            onClick={() => setShowInactive(true)}
-                        >
-                            <i className="bi bi-eye-slash me-1"></i>Inactivos
-                        </button>
-                    </div>
+            <ModuleHeader title="Mobiliario Subcontratado" />
+
+            {loading ? (
+                <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status"></div>
+                    <p className="mt-2 text-muted">Cargando rentas con subcontrato...</p>
                 </div>
-            </ModuleHeader>
+            ) : rentals.length === 0 ? (
+                <div className="text-center text-muted py-5">
+                    <i className="bi bi-truck" style={{ fontSize: "3rem" }}></i>
+                    <p className="mt-3 fs-5">No hay rentas con subcontrato</p>
+                    <p className="small">Marca productos como subcontratados en el wizard de rentas para verlos aquí</p>
+                </div>
+            ) : (
+                <>
+                    {/* Pendientes */}
+                    {pendingRentals.length > 0 && (
+                        <div className="mb-4">
+                            <h5 className="mb-3">
+                                <i className="bi bi-clock-history me-2 text-warning"></i>
+                                Pendientes de completar
+                                <span className="badge bg-warning text-dark ms-2">{pendingRentals.length}</span>
+                            </h5>
+                            <div className="row">
+                                {pendingRentals.map(rental => (
+                                    <RentalCard key={rental.id} rental={rental} isPending={true} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
-            {/* Buscador fuera del header para que el dropdown no se corte */}
-            <div className="mb-3">
-                <RentalSearchDropdown
-                    selectedRental={selectedRental}
-                    onSelect={handleSelectRental}
-                    onClear={handleClearRental}
+                    {/* Completados */}
+                    {completedRentals.length > 0 && (
+                        <div className="mb-4">
+                            <h5 className="mb-3">
+                                <i className="bi bi-check-circle me-2 text-success"></i>
+                                Completados
+                                <span className="badge bg-success ms-2">{completedRentals.length}</span>
+                            </h5>
+                            <div className="row">
+                                {completedRentals.map(rental => (
+                                    <RentalCard key={rental.id} rental={rental} isPending={false} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
+            )}
+
+            {selectedRental && (
+                <SubcontractModal
+                    rental={selectedRental}
+                    providers={providers}
+                    currentUser={currentUser}
+                    onClose={handleCloseModal}
                 />
-            </div>
-
-            {selectedRental && <RentalProfitabilityCard profitability={profitability} />}
-
-            <ExternalItemTable
-                items={items}
-                onEdit={handleEdit}
-                onDeactivate={handleDeactivate}
-                onActivate={handleActivate}
-                showInactive={showInactive}
-            />
-
-            <ExternalItemModal
-                isOpen={isModalOpen}
-                onClose={handleModalClose}
-                handlerAdd={handleAdd}
-                itemSelected={itemSelected}
-                providers={providers}
-                lockRentalId={!!selectedRental}
-            />
+            )}
         </>
     );
 };

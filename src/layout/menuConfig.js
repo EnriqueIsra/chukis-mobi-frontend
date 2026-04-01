@@ -32,5 +32,8 @@ export const menuItems = [
   { path: "/providers", label: "Proveedores", icon: "bi-people" },
   { path: "/rental-external-items", label: "Subcontratados", icon: "bi-box-arrow-in-down" },
   { path: "/expenses", label: "Gastos", icon: "bi-cash-stack" },
-  { path: "/nomina", label: "Cagada de Aguila", icon: "bi-cash-coin" }
+  { path: "/nomina", label: "Cagada de Aguila", icon: "bi-cash-coin" },
+  { path: "/reports", label: "Reportes", icon: "bi-graph-up" },
+  { path: "/quotations", label: "Cotizaciones", icon: "bi-file-earmark-text" },
+  { path: "/contracts", label: "Contratos", icon: "bi-file-earmark-check" }
 ];

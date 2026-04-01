@@ -108,9 +108,9 @@ export const ExpenseCard = ({ expense, onEdit, onDeactivate, onActivate, current
                         <p className="text-muted small mb-2">{expense.description}</p>
                     )}
 
-                    <small className="text-muted">
+                    <small className="text-muted text-capitalize">
                         <i className="bi bi-calendar me-1"></i>
-                        {new Date(expense.expenseDate).toLocaleString("es-MX")}
+                        {new Date(expense.expenseDate).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </small>
                 </div>
 

@@ -1,43 +1,37 @@
 import { useNavigate } from 'react-router-dom'
-/* 
-    Componente QuickActions - Botones de acciones rápidas
-    Permite navegar rápidamente a crear renta o agregar cliente
-*/
+import './quickActions.css'
+
 export const QuickActions = () => {
     const navigate = useNavigate();
 
-    // Navegar a la página de rentas
-    const handleNewRental = () => {
-        navigate('/rentals');
-    }
-
-    // navegar a la página de clientes
-    const handleNewClient = () => {
-        navigate('/clients');
-    }
+    const actions = [
+        { label: "Nueva Renta", icon: "bi-plus-lg", path: "/rentals" },
+        { label: "Agregar Cliente", icon: "bi-person-plus", path: "/clients" },
+        { label: "Nuevo Usuario", icon: "bi-person-gear", path: "/users" },
+        { label: "Nuevo Producto", icon: "bi-box-seam", path: "/products" },
+        { label: "Nuevo Proveedor", icon: "bi-truck", path: "/providers" },
+        { label: "Nuevo Gasto", icon: "bi-cash-stack", path: "/expenses" },
+        { label: "Pago a Trabajador", icon: "bi-cash-coin", path: "/nomina" },
+    ];
 
     return (
         <div className='card shadow-sm mb-4'>
             <div className='card-body'>
                 <h5 className='card-title mb-3'>
                     <i className='bi bi-lightning-charge me-2 text-warning'></i>
-                    Acciones Rápidas
+                    Acciones Rapidas
                 </h5>
                 <div className='d-flex flex-wrap gap-2'>
-                    <button
-                        className='btn btn-primary'
-                        onClick={handleNewRental}
-                    >
-                        <i className='bi bi-plus-lg me-2'></i>
-                        Nueva Renta
-                    </button>
-                    <button
-                        className='btn btn-outline-primary'
-                        onClick={handleNewClient}
-                    >
-                        <i className='bi bi-person-plus me-2'></i>
-                        Agregar Cliente
-                    </button>
+                    {actions.map((action) => (
+                        <button
+                            key={action.path}
+                            className='btn quick-action-btn'
+                            onClick={() => navigate(action.path)}
+                        >
+                            <i className={`bi ${action.icon} me-2`}></i>
+                            {action.label}
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>

@@ -66,8 +66,8 @@ export const WorkerCard = ({ summary, onEdit, onDeactivate, onActivate, showInac
                     summary.payments.map((payment) => (
                         <div key={payment.id} className={`worker-card-payment-item ${!payment.active ? "worker-card-payment-inactive" : ""}`}>
                             <div className="worker-card-payment-info">
-                                <span className="worker-card-payment-date">
-                                    {new Date(payment.paymentDate).toLocaleDateString("es-MX")}
+                                <span className="worker-card-payment-date text-capitalize">
+                                    {new Date(payment.paymentDate).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                                 </span>
                                 <span className="worker-card-payment-amount">
                                     ${payment.amount.toLocaleString()}

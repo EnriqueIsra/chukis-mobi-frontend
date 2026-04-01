@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Swal from "sweetalert2";
 import { RentalsToolbar } from "../components/rentals/RentalToolBar";
 import { RentalWizard } from "../components/rentals/wizard/RentalWizard";
 import RentalTable from "../components/rentals/RentalTable";
 import { RentalCard } from "../components/rentals/RentalCard";
-import { findAll, findInactive, deactivate, activate, updateRentalStatus } from "../services/rentalService";
+import { findAll, findInactive, deactivate, activate, updateRentalStatus, generateContract } from "../services/rentalService";
 import PaymentModal from "../components/payments/PaymentModal";
 import RentalDetailModal from "../components/rentals/RentalDetailModal";
 import { ModuleHeader } from "../components/common/ModuleHeader";
+import { ContractPreview } from "../components/contracts/ContractPreview";
 
 export const RentalsPage = () => {
   const currentUser = JSON.parse(localStorage.getItem("user"));
@@ -22,6 +23,8 @@ export const RentalsPage = () => {
   const [loading, setLoading] = useState(true);
   const [paymentRental, setPaymentRental] = useState(null);
   const [selectedRental, setSelectedRental] = useState(null);
+  const [contractRental, setContractRental] = useState(null);
+  const contractRef = useRef(null);
 
   const getRentals = async () => {
     setLoading(true);
@@ -38,6 +41,7 @@ export const RentalsPage = () => {
 
   const filteredRentals = Array.isArray(rentals) ? rentals.filter(rental => {
     const search = searchTerm.toLowerCase();
+    const matchId = rental.id?.toString().includes(search);
     const matchAddress = rental.address?.toLowerCase().includes(search);
     const matchStatus = rental.status?.toLowerCase().includes(search);
     const matchTotal = rental.total?.toString().includes(search);
@@ -49,7 +53,7 @@ export const RentalsPage = () => {
       item.quantity?.toString().includes(search) ||
       item.unitPrice?.toString().includes(search)
     );
-    return matchAddress || matchStatus || matchTotal || matchClientName || matchClientPhone || matchUsername || matchItems;
+    return matchId || matchAddress || matchStatus || matchTotal || matchClientName || matchClientPhone || matchUsername || matchItems;
   }) : [];
 
   const handlerOpenWizard = () => {
@@ -120,8 +124,18 @@ export const RentalsPage = () => {
       Swal.fire('Actualizado', 'El estado fue actualizado correctamente', 'success');
       getRentals();
     } catch (error) {
-      console.error(error);
-      Swal.fire('Error', 'No se pudo cambiar el estado', 'error');
+      console.error("Status:", error.response?.status, "Data:", error.response?.data);
+      const backendMsg = error.response?.data?.message || error.response?.data;
+      if (backendMsg && String(backendMsg).includes("Falta por cobrar")) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Pago incompleto',
+          html: `<p>${String(backendMsg)}</p><p class="text-muted mt-2">Registra el pago de la cantidad faltante para poder liberar o marcar esta renta como recogida.</p>`,
+          confirmButtonText: 'Entendido'
+        });
+      } else {
+        Swal.fire('Error', String(backendMsg || 'No se pudo cambiar el estado'), 'error');
+      }
     }
   };
 
@@ -147,6 +161,28 @@ export const RentalsPage = () => {
   };
 
   const handlerOpenPayment = (rental) => setPaymentRental(rental);
+
+  const handleContract = async (rental) => {
+    // Marcar la renta como con contrato en el backend
+    await generateContract(rental.id);
+    setContractRental(rental);
+    setTimeout(async () => {
+      const element = contractRef.current;
+      if (!element) return;
+      const html2pdf = (await import("html2pdf.js")).default;
+      html2pdf()
+        .set({
+          margin: [8, 10, 8, 10],
+          filename: `Contrato_Renta_${rental.id}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        })
+        .from(element)
+        .save()
+        .then(() => setContractRental(null));
+    }, 200);
+  };
   const handlerClosePayment = () => setPaymentRental(null);
   const handlerPaymentCreated = () => getRentals();
 
@@ -207,6 +243,7 @@ export const RentalsPage = () => {
           onChangeStatus={handlerChangeStatus}
           onCancel={handlerCancelRental}
           onPayment={handlerOpenPayment}
+          onContract={handleContract}
           showInactive={showInactive}
         />
       ) : (
@@ -225,6 +262,7 @@ export const RentalsPage = () => {
                 onChangeStatus={handlerChangeStatus}
                 onCancel={handlerCancelRental}
                 onPayment={handlerOpenPayment}
+                onContract={handleContract}
               />
             ))
           )}
@@ -257,7 +295,15 @@ export const RentalsPage = () => {
           onCancel={handlerCancelRental}
           onDeactivate={handleDeactivate}
           onPayment={handlerOpenPayment}
+          onContract={handleContract}
         />
+      )}
+
+      {/* Preview oculto para generar contrato PDF */}
+      {contractRental && (
+        <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+          <ContractPreview ref={contractRef} rental={contractRental} />
+        </div>
       )}
     </>
   );

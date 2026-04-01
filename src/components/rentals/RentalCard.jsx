@@ -8,12 +8,14 @@ const statusConfig = {
   CANCELLED: { label: 'Cancelada', class: 'bg-danger', icon: 'bi-x-circle' }
 };
 
-const formatDateTimeShort = (dateTimeStr) => {
+const formatDateTimeLong = (dateTimeStr) => {
   if (!dateTimeStr) return 'N/A';
   const date = new Date(dateTimeStr);
-  return date.toLocaleString('es-MX', {
-    day: '2-digit',
-    month: '2-digit',
+  return date.toLocaleDateString('es-MX', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
@@ -27,7 +29,8 @@ export const RentalCard = ({
   onActivate,
   onChangeStatus,
   onCancel,
-  onPayment
+  onPayment,
+  onContract
 }) => {
   const status = statusConfig[rental.status] || statusConfig.CREATED;
 
@@ -82,6 +85,15 @@ export const RentalCard = ({
                   title="Registrar pago"
                 >
                   <i className="bi bi-cash-coin"></i>
+                </button>
+              )}
+              {rental.status !== 'CANCELLED' && (
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={(e) => { e.stopPropagation(); onContract(rental); }}
+                  title="Generar contrato"
+                >
+                  <i className="bi bi-file-earmark-text"></i>
                 </button>
               )}
               <button
@@ -140,9 +152,15 @@ export const RentalCard = ({
           {/* Header */}
           <div className="rental-card-header">
             <div className="rental-id">#{rental.id}</div>
-            <div className="rental-dates">
-              <i className="bi bi-calendar-range me-1"></i>
-              {formatDateTimeShort(rental.startDate)} - {formatDateTimeShort(rental.endDate)}
+            <div className="rental-dates text-capitalize">
+              <div>
+                <i className="bi bi-calendar-event me-1"></i>
+                <strong>Inicio:</strong> {formatDateTimeLong(rental.startDate)}
+              </div>
+              <div>
+                <i className="bi bi-calendar-check me-1"></i>
+                <strong>Fin:</strong> {formatDateTimeLong(rental.endDate)}
+              </div>
             </div>
           </div>
 

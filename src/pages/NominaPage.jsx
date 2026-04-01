@@ -18,7 +18,7 @@ export const NominaPage = () => {
     const [payments, setPayments] = useState([]);
     const [monthlySummary, setMonthlySummary] = useState([]);
     const [users, setUsers] = useState([]);
-    const [viewMode, setViewMode] = useState("list");
+    const [viewMode, setViewMode] = useState("grouped");
     const [showInactive, setShowInactive] = useState(false);
     const [selectedYear, setSelectedYear] = useState(today.getFullYear());
     const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);

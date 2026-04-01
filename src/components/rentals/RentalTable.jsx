@@ -28,6 +28,7 @@ const RentalTable = ({
   onChangeStatus,
   onCancel,
   onPayment,
+  onContract,
   showInactive
 }) => {
 
@@ -143,6 +144,15 @@ const RentalTable = ({
                           title="Registrar pago"
                         >
                           <i className="bi bi-cash-coin"></i>
+                        </button>
+                      )}
+                      {rental.status !== 'CANCELLED' && (
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => onContract(rental)}
+                          title="Generar contrato"
+                        >
+                          <i className="bi bi-file-earmark-text"></i>
                         </button>
                       )}
                       <button

@@ -44,9 +44,14 @@ export const getDeliveries = async (days = 0) => {
 // Retorna un array donde cada elemento tiene:
 //  { date: "2026-02-12", cobrado: 500, anticipos: 200, porCobrar: 300}
 // =================
-export const getMonthlyIncome = async () => {
+export const getMonthlyIncome = async (year, month) => {
     try {
-        const response = await axiosInstance.get("/dashboard/income/monthly")
+        const params = {}
+        if (year != null && month != null) {
+            params.year = year
+            params.month = month
+        }
+        const response = await axiosInstance.get("/dashboard/income/monthly", { params })
         return response
     } catch (error) {
         console.error("Error fetching monthly income: ", error)

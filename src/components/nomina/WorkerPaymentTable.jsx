@@ -41,7 +41,7 @@ export const WorkerPaymentTable = ({ payments, onEdit, onDeactivate, onActivate,
                         <tr key={payment.id} className={!payment.active ? "table-secondary" : ""}>
                             <td>{payment.workerUsername}</td>
                             <td>${payment.amount.toLocaleString()}</td>
-                            <td>{new Date(payment.paymentDate).toLocaleString("es-MX")}</td>
+                            <td className="text-capitalize">{new Date(payment.paymentDate).toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
                             <td>{payment.registeredByUsername}</td>
                             <td>{payment.notes || "—"}</td>
                             {showInactive && <td>{payment.desactivationReason || "—"}</td>}

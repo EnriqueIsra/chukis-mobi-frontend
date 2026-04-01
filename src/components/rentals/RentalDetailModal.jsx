@@ -18,12 +18,13 @@ const statusConfig = {
 const formatDateTime = (dateTimeStr) => {
     if (!dateTimeStr) return 'N/A'
     const date = new Date(dateTimeStr)
-    return date.toLocaleString('es-MX', {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
+    return date.toLocaleDateString('es-MX', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     })
 }
 
@@ -46,7 +47,8 @@ const RentalDetailModal = ({
     onChangeStatus,
     onCancel,
     onDeactivate,
-    onPayment
+    onPayment,
+    onContract
 }) => {
     // Estado para los pagos de esta renta. Se cargan automáticamente al abrir el modal
     const [payments, setPayments] = useState([])
@@ -145,6 +147,18 @@ const RentalDetailModal = ({
                                     </button>
                                 )}
 
+                                {/* Contrato - no aparece en canceladas */}
+                                {rental.status !== 'CANCELLED' && (
+                                    <button
+                                        className="btn btn-sm btn-outline-secondary"
+                                        onClick={() => { onClose(); onContract(rental) }}
+                                        title="Generar contrato"
+                                    >
+                                        <i className="bi bi-file-earmark-text"></i>
+                                        Contrato
+                                    </button>
+                                )}
+
                                 {/* Cancelar - visible si la renta NO está cancelada */}
                                 {rental.status !== 'CANCELLED' && (
                                     <button
@@ -218,14 +232,14 @@ const RentalDetailModal = ({
                                 </div>
                                 <div className="row mb-2">
                                     <div className="col-4 text-muted">Inicio:</div>
-                                    <div className="col-8">
+                                    <div className="col-8 text-capitalize">
                                         <i className="bi bi-calendar me-1 text-primary"></i>
                                         {formatDateTime(rental.startDate)}
                                     </div>
                                 </div>
                                 <div className="row mb-2">
                                     <div className="col-4 text-muted">Fin:</div>
-                                    <div className="col-8">
+                                    <div className="col-8 text-capitalize">
                                         <i className="bi bi-calendar-check me-1 text-success"></i>
                                         {formatDateTime(rental.endDate)}
                                     </div>

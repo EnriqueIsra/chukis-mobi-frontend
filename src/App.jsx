@@ -13,6 +13,9 @@ import { ProvidersPage } from "./pages/ProvidersPage";
 import { RentalExternalItemsPage } from "./pages/RentalExternalItemsPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
 import { NominaPage } from "./pages/NominaPage";
+import { ReportsPage } from "./pages/ReportsPage";
+import { QuotationsPage } from "./pages/QuotationsPage";
+import { ContractsPage } from "./pages/ContractsPage";
 
 // Función para verificar si token JWT está expirado
 // Un token JWT tiene 3 partes separadas por puntos:
@@ -97,6 +100,9 @@ export const App = () => {
           <Route path="/rental-external-items" element={<RentalExternalItemsPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/nomina" element={<NominaPage />} />
+          <Route path="/reports" element={<ReportsPage />} />
+          <Route path="/quotations" element={<QuotationsPage />} />
+          <Route path="/contracts" element={<ContractsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
