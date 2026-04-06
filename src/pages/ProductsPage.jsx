@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+// useRef nos permite crear una referencia a un elemento del DOM
+// Lo necesitamos para apuntar al contenedor oculto donde se renderiza el PDF
+import { useState, useEffect, useRef } from "react";
 import { ProductTable } from "../components/products/ProductTable";
 import { ProductsToolbar } from "../components/products/ProductsToolbar";
 import { ProductCard } from "../components/products/ProductCard";
@@ -18,6 +20,12 @@ export const ProductsPage = () => {
     const [viewMode, setViewMode] = useState("cards");
     const [showInactive, setShowInactive] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // Referencia al div oculto donde se construye el HTML del reporte antes de convertirlo a PDF
+    const reportRef = useRef(null);
+
+    // Controla qué modo de reporte se está generando("cards" o "list")
+    // Se usa para ajustar el ancho del contenedor: 700 px para cards (portrait), 1050 para lista (landscape)
+    const [reportMode, setReportMode] = useState(null);
 
     const loadProducts = async () => {
         const result = showInactive ? await findInactive() : await findAll();
@@ -94,6 +102,30 @@ export const ProductsPage = () => {
         await activate(id);
         loadProducts();
     };
+
+    // html2pdf.js no puede cargar imágenes de otro servidor (localhost:8080)
+    // porque las trata como "externas" por CORS.
+    // La solución: convertir cada imagen a base64 ANTES de generar el PDF.
+    // Proceso: crear un Image -> dibujarlo en un Canvas -> extraer como dataURL
+    const toBase64 = (url) => {
+        return new Promise((resolve) => {
+            if (!url) { resolve(null); return; }
+            const img = new Image()
+            img.crossOrigin = "anonymous"; // Permite leer imágenes de otro origen
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width
+                canvas.height = img.height
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/jpeg", 0.8)) // Convierte a base64
+            }
+            img.onerror = () => resolve(null) // si falla, devuelve null
+            img.src = url;
+        })
+    }
+
+    const formatMoney = (amount) => "$" + (amount || 0).toLocaleString();
+    
 
     return (
         <>
