@@ -39,6 +39,15 @@ export const create = async (data) => {
     return undefined;
 }
 
+export const update = async (id, data) => {
+    try {
+        return await axiosInstance.put(`/quotations/${id}`, data);
+    } catch (error) {
+        console.error(error);
+    }
+    return undefined;
+}
+
 export const deactivate = async (id, reason, userId) => {
     try {
         return await axiosInstance.patch(`/quotations/${id}/deactivate`, { reason, userId });

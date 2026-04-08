@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 
-export const ProductTable = ({ products, onEdit, onDeactivate, onActivate, showInactive }) => {
+export const ProductTable = ({ products, onView, onEdit, onDeactivate, onActivate, showInactive }) => {
 
   const handleDeactivate = async (product) => {
     const result = await Swal.fire({
@@ -51,6 +51,13 @@ export const ProductTable = ({ products, onEdit, onDeactivate, onActivate, showI
                 <div className="d-flex gap-1 flex-wrap">
                   {product.active ? (
                     <>
+                      <button className="btn btn-sm btn-outline-primary me-1"
+                        onClick={() => onView(product)}
+                        title="Ver detalles"
+                        >
+                          <i className="bi bi-eye me-1"></i>
+                          <span className="d-none d-md-inline"> Detalles</span>
+                      </button>
                       <button className="btn btn-sm btn-outline-primary"
                         onClick={() => onEdit(product)}>
                         <i className="bi bi-pencil"></i>

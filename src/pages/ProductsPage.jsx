@@ -8,6 +8,7 @@ import { ProductModal } from "../components/products/ProductModal";
 import Swal from "sweetalert2";
 import { findAll, findInactive, create, update, deactivate, activate } from "../services/productService";
 import { ModuleHeader } from "../components/common/ModuleHeader";
+import { ProductDetailModal } from "../components/products/ProductDetailModal";
 
 export const ProductsPage = () => {
 
@@ -20,6 +21,9 @@ export const ProductsPage = () => {
     const [viewMode, setViewMode] = useState("cards");
     const [showInactive, setShowInactive] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // Producto que se visualiza en el modal de detalles (galería de imágenes)
+    const [detailProduct, setDetailProduct] = useState(null)
+
     // Referencia al div oculto donde se construye el HTML del reporte antes de convertirlo a PDF
     const reportRef = useRef(null);
 
@@ -308,6 +312,7 @@ export const ProductsPage = () => {
             {viewMode === "table" ? (
                 <ProductTable
                     products={filteredProducts}
+                    onView={(product) => setDetailProduct(product)}
                     onEdit={handlerProductSelected}
                     onDeactivate={handleDeactivate}
                     onActivate={handleActivate}
@@ -320,6 +325,7 @@ export const ProductsPage = () => {
                             <ProductCard
                                 key={product.id}
                                 product={product}
+                                onView={() => setDetailProduct(product)}
                                 onEdit={handlerProductSelected}
                                 onDeactivate={handleDeactivate}
                                 onActivate={handleActivate}
@@ -336,6 +342,13 @@ export const ProductsPage = () => {
                 onClose={handlerCloseModal}
                 handlerAdd={handlerAddProduct}
                 productSelected={productSelected}
+            />
+
+            {/* Modal de detalles del producto con galería de imágenes */}
+            <ProductDetailModal
+                product={detailProduct}
+                isOpen={detailProduct !== null}
+                onClose={() => setDetailProduct(null)}
             />
 
             {/* Contenedor oculto fuera de la pantalla donde se construye el HTML del reporte.

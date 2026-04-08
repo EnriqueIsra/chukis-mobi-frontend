@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import Swal from "sweetalert2";
 import './productCard.css';
 
-export const ProductCard = ({ product, onEdit, onDeactivate, onActivate }) => {
+export const ProductCard = ({ product, onView, onEdit, onDeactivate, onActivate }) => {
 
   const handleDeactivate = async () => {
     const result = await Swal.fire({
@@ -24,7 +24,11 @@ export const ProductCard = ({ product, onEdit, onDeactivate, onActivate }) => {
   };
 
   return (
-    <div className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-3">
+    <div 
+      className="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-3"
+      onClick={() => onView(product)}
+      style={{ cursor: "pointer" }}
+    >
       <div className="card product-card h-100 shadow-sm position-relative">
 
         {/* Hover actions — fuera de la opacidad */}
@@ -33,14 +37,16 @@ export const ProductCard = ({ product, onEdit, onDeactivate, onActivate }) => {
             <>
               <button
                 className="btn btn-sm btn-outline-warning"
-                onClick={() => onEdit(product)}
+                // El stopPropagation() va PRIMERO para evitar que el clic "suba" al div padre
+                // Si no lo ponemos, al dar clic en Editar también se abriría el modal de detalles
+                onClick={(e) => {e.stopPropagation(); onEdit(product); }}
                 title="Editar"
               >
                 <i className="bi bi-pencil"></i>
               </button>
               <button
                 className="btn btn-sm btn-outline-danger"
-                onClick={handleDeactivate}
+                onClick={(e) => {e.stopPropagation(); handleDeactivate(); }}
                 title="Desactivar"
               >
                 <i className="bi bi-trash"></i>
@@ -50,7 +56,8 @@ export const ProductCard = ({ product, onEdit, onDeactivate, onActivate }) => {
             <button
               className="btn btn-sm btn-outline-success"
               title="Reactivar"
-              onClick={async () => {
+              onClick={async (e) => {
+                e.stopPropagation()
                 const result = await Swal.fire({
                   title: "¿Reactivar producto?",
                   text: `Se reactivará "${product.name}"`,

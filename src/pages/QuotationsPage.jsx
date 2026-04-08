@@ -16,6 +16,7 @@ export const QuotationsPage = () => {
     const [showInactive, setShowInactive] = useState(false);
     const [products, setProducts] = useState([]);
     const [isCreating, setIsCreating] = useState(false);
+    const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(emptyForm);
     const [selectedQuotation, setSelectedQuotation] = useState(null);
     const previewRef = useRef(null);
@@ -92,7 +93,6 @@ export const QuotationsPage = () => {
             Swal.fire("Error", "Agrega al menos un producto", "error");
             return;
         }
-        // Validar que todas las cantidades sean validas
         const invalidItem = form.items.find(i => !i.quantity || i.quantity <= 0);
         if (invalidItem) {
             Swal.fire("Error", `La cantidad de "${invalidItem.name}" debe ser mayor a 0`, "error");
@@ -104,11 +104,31 @@ export const QuotationsPage = () => {
             userId: currentUser.id,
             total: calculateTotal()
         };
-        await quotationService.create(data);
+        if (editingId) {
+            await quotationService.update(editingId, data);
+            Swal.fire("Cotizacion actualizada", "", "success");
+        } else {
+            await quotationService.create(data);
+            Swal.fire("Cotizacion creada", "", "success");
+        }
         setIsCreating(false);
+        setEditingId(null);
         setForm(emptyForm);
-        Swal.fire("Cotizacion creada", "", "success");
         loadQuotations();
+    };
+
+    const handleEdit = (q) => {
+        setEditingId(q.id);
+        setForm({
+            items: q.items.map(i => ({
+                productId: i.productId,
+                name: i.productName,
+                price: i.price,
+                quantity: i.quantity
+            })),
+            notes: q.notes || ""
+        });
+        setIsCreating(true);
     };
 
     const handleDeactivate = async (id) => {
@@ -195,7 +215,7 @@ export const QuotationsPage = () => {
         <div className="container-fluid py-4">
             <ModuleHeader title="Cotizaciones">
                 <div className="col-auto">
-                    <button className="btn btn-primary" onClick={() => { setIsCreating(true); setForm(emptyForm); }}>
+                    <button className="btn btn-primary" onClick={() => { setIsCreating(true); setEditingId(null); setForm(emptyForm); }}>
                         <i className="bi bi-plus-lg me-1"></i> Nueva Cotizacion
                     </button>
                 </div>
@@ -221,8 +241,8 @@ export const QuotationsPage = () => {
             {isCreating && (
                 <div className="card mb-4">
                     <div className="card-header d-flex justify-content-between align-items-center">
-                        <strong>Nueva Cotizacion</strong>
-                        <button className="btn btn-sm btn-outline-danger" onClick={() => setIsCreating(false)}>
+                        <strong>{editingId ? `Editar Cotizacion #${editingId}` : "Nueva Cotizacion"}</strong>
+                        <button className="btn btn-sm btn-outline-danger" onClick={() => { setIsCreating(false); setEditingId(null); setForm(emptyForm); }}>
                             <i className="bi bi-x-lg"></i>
                         </button>
                     </div>
@@ -350,7 +370,7 @@ export const QuotationsPage = () => {
                                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
                                 />
                                 <button className="btn btn-primary w-100" onClick={handleSave}>
-                                    <i className="bi bi-check-lg me-1"></i> Guardar Cotizacion
+                                    <i className="bi bi-check-lg me-1"></i> {editingId ? "Actualizar Cotizacion" : "Guardar Cotizacion"}
                                 </button>
                             </div>
                         </div>
@@ -400,6 +420,10 @@ export const QuotationsPage = () => {
                                 <div className="card-footer d-flex gap-2">
                                     {q.active ? (
                                         <>
+                                            <button className="btn btn-sm btn-outline-primary"
+                                                    onClick={() => handleEdit(q)}>
+                                                <i className="bi bi-pencil me-1"></i> Editar
+                                            </button>
                                             <button className="btn btn-sm btn-outline-danger"
                                                     onClick={() => handleExportPdf(q)}>
                                                 <i className="bi bi-file-earmark-pdf me-1"></i> PDF
@@ -465,7 +489,8 @@ export const QuotationsPage = () => {
                                 fontSize: "0.9em",
                                 color: "#555"
                             }}>
-                                <strong>Notas:</strong> {selectedQuotation.notes}
+                                <strong>Notas:</strong><br />
+                                <span dangerouslySetInnerHTML={{ __html: selectedQuotation.notes.replace(/\n/g, "<br />") }}></span>
                             </div>
                         )}
 
@@ -484,7 +509,7 @@ export const QuotationsPage = () => {
                                         <img
                                             src={item.imageBase64 || item.productImageUrl}
                                             alt={item.productName}
-                                            style={{ width: "100%", height: "70px", objectFit: "cover" }}
+                                            style={{ width: "100%", height: "120px", objectFit: "cover" }}
                                         />
                                     )}
                                     <div style={{ padding: "6px 8px" }}>
