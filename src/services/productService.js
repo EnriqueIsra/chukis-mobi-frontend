@@ -68,10 +68,15 @@ export const activate = async (id) => {
 };
 
 // Obtener disponibilidad de productos por fechas
-export const getAvailability = async (startDate, endDate) => {
+export const getAvailability = async (startDate, endDate, excludeRentalId = null) => {
   try {
+    const params = { startDate, endDate };
+    if (excludeRentalId) {
+      params.excludeRentalId = excludeRentalId;
+    }
+
     const response = await axiosInstance.get(`/products/availability`, {
-      params: { startDate, endDate }
+      params
     });
     return response;
   } catch (error) {

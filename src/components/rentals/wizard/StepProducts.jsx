@@ -18,7 +18,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
   useEffect(() => {
     if (rentalData.startDate && rentalData.endDate) {
       setLoading(true);
-      getAvailability(rentalData.startDate, rentalData.endDate)
+      getAvailability(rentalData.startDate, rentalData.endDate, rentalData.id)
         .then((res) => {
           if (res && res.data) {
             setProducts(res.data);
@@ -26,7 +26,7 @@ const StepProducts = ({ rentalData, setRentalData, onNext, onBack }) => {
         })
         .finally(() => setLoading(false));
     }
-  }, [rentalData.startDate, rentalData.endDate]);
+  }, [rentalData.startDate, rentalData.endDate, rentalData.id]);
 
   // productos filtrados 
   /* Reusa exactamente la misma lógica que ProductsPage */
